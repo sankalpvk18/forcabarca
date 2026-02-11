@@ -1,0 +1,142 @@
+[
+  {
+    "id": "1",
+    "year": 1899,
+    "title": "Foundation of FC Barcelona",
+    "description": "FC Barcelona was founded on November 29, 1899, by a group of Swiss, Catalan, German, and English footballers led by Joan Gamper. The club was established with the motto 'Més que un club' (More than a club), representing Catalan culture and identity.",
+    "category": "founding"
+  },
+  {
+    "id": "2",
+    "year": 1929,
+    "title": "First La Liga Title",
+    "description": "Barcelona won the inaugural La Liga championship, establishing themselves as one of Spain's football powerhouses. This victory marked the beginning of a storied rivalry with Real Madrid that continues to define Spanish football.",
+    "category": "trophy"
+  },
+  {
+    "id": "3",
+    "year": 1957,
+    "title": "Camp Nou Opens",
+    "description": "The iconic Camp Nou stadium opened its doors on September 24, 1957. With an initial capacity of 93,000, it became one of Europe's largest stadiums and has been the spiritual home of Barcelona ever since.",
+    "category": "stadium"
+  },
+  {
+    "id": "4",
+    "year": 1973,
+    "title": "Johan Cruyff Arrives",
+    "description": "Dutch legend Johan Cruyff joined Barcelona as a player, bringing Total Football philosophy to Catalunya. His arrival transformed the club's playing style and laid the foundation for decades of success.",
+    "category": "legend"
+  },
+  {
+    "id": "5",
+    "year": 1992,
+    "title": "First European Cup Victory",
+    "description": "Under Johan Cruyff as manager, Barcelona won their first European Cup at Wembley, defeating Sampdoria 1-0. Ronald Koeman's free-kick sealed the historic victory that began Barcelona's European dominance.",
+    "category": "trophy"
+  },
+  {
+    "id": "6",
+    "year": 1999,
+    "title": "Centenary Celebrations",
+    "description": "Barcelona celebrated 100 years of history with commemorative events and matches. The centenary year reinforced the club's significance as a cultural institution representing Catalan identity and values.",
+    "category": "milestone"
+  },
+  {
+    "id": "7",
+    "year": 2004,
+    "title": "Lionel Messi's First Team Debut",
+    "description": "A 17-year-old Lionel Messi made his first-team debut against Espanyol. This marked the beginning of the most extraordinary individual career in Barcelona's history and arguably in all of football.",
+    "category": "legend"
+  },
+  {
+    "id": "8",
+    "year": 2006,
+    "title": "Champions League Victory in Paris",
+    "description": "Barcelona defeated Arsenal 2-1 in Paris to win their second Champions League title. This victory under Frank Rijkaard showcased the emerging talents of Messi, Iniesta, and Xavi.",
+    "category": "trophy"
+  },
+  {
+    "id": "9",
+    "year": 2008,
+    "title": "Pep Guardiola Appointed Manager",
+    "description": "Former Barcelona midfielder Pep Guardiola was appointed first-team manager, beginning the most successful era in club history. His philosophy of possession-based football redefined modern soccer.",
+    "category": "milestone"
+  },
+  {
+    "id": "10",
+    "year": 2009,
+    "title": "Historic Sextuple",
+    "description": "Barcelona achieved the unprecedented sextuple, winning all six competitions: La Liga, Copa del Rey, Champions League, Spanish Super Cup, UEFA Super Cup, and FIFA Club World Cup. This remains football's greatest single-season achievement.",
+    "category": "trophy"
+  },
+  {
+    "id": "11",
+    "year": 2011,
+    "title": "Wembley Champions League Glory",
+    "description": "Barcelona produced one of the greatest Champions League final performances, defeating Manchester United 3-1 at Wembley. The display of tiki-taka football is considered among the finest in history.",
+    "category": "iconic match"
+  },
+  {
+    "id": "12",
+    "year": 2012,
+    "title": "Messi Scores 91 Goals in Calendar Year",
+    "description": "Lionel Messi scored an incredible 91 goals in the calendar year 2012, breaking Gerd Müller's 40-year-old record. This achievement solidified Messi's status as the greatest player of his generation.",
+    "category": "legend"
+  },
+  {
+    "id": "13",
+    "year": 2015,
+    "title": "Second Treble Achieved",
+    "description": "Barcelona won La Liga, Copa del Rey, and Champions League under Luis Enrique. The MSN trio of Messi, Suárez, and Neymar scored 122 goals combined, creating one of football's most devastating attacks.",
+    "category": "trophy"
+  },
+  {
+    "id": "14",
+    "year": 2017,
+    "title": "Historic 6-1 Remontada",
+    "description": "Barcelona achieved the impossible, overturning a 4-0 first-leg deficit against Paris Saint-Germain to win 6-1 at Camp Nou. The 6-5 aggregate victory remains one of Champions League's greatest comebacks.",
+    "category": "iconic match"
+  },
+  {
+    "id": "15",
+    "year": 2019,
+    "title": "Ansu Fati Becomes Youngest Goalscorer",
+    "description": "Ansu Fati became Barcelona's youngest ever goalscorer at 16 years and 304 days, continuing the club's tradition of nurturing young talent through La Masia academy.",
+    "category": "legend"
+  },
+  {
+    "id": "16",
+    "year": 2021,
+    "title": "Messi's Departure",
+    "description": "After 21 years at the club, Lionel Messi left Barcelona due to financial constraints. His departure marked the end of an era and began a new chapter in the club's history focused on rebuilding.",
+    "category": "milestone"
+  },
+  {
+    "id": "17",
+    "year": 2021,
+    "title": "Xavi Returns as Manager",
+    "description": "Club legend Xavi Hernández returned to Barcelona as head coach, bringing back the principles of possession-based football and La Masia values. His appointment symbolized a return to the club's identity.",
+    "category": "milestone"
+  },
+  {
+    "id": "18",
+    "year": 2023,
+    "title": "La Liga Champions Again",
+    "description": "Barcelona reclaimed the La Liga title under Xavi's management, demonstrating the club's resurgence after financial difficulties. The championship represented a new era of success built on youth and academy graduates.",
+    "category": "trophy"
+  },
+  {
+    "id": "19",
+    "year": 2024,
+    "title": "Lamine Yamal Breaks Records",
+    "description": "16-year-old Lamine Yamal became Barcelona's youngest player in multiple competitions, continuing the legacy of La Masia. His emergence represents the future of Barcelona and Spanish football.",
+    "category": "legend"
+  },
+  {
+    "id": "20",
+    "year": 2026,
+    "title": "New Spotify Camp Nou Completion",
+    "description": "The renovated Spotify Camp Nou is set to be completed with a capacity of 105,000, state-of-the-art facilities, and sustainable technology. The new stadium will secure Barcelona's position as a global football institution.",
+    "category": "stadium"
+  }
+]
