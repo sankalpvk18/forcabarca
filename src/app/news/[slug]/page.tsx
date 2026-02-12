@@ -26,24 +26,24 @@ export default function NewsArticlePage({ params }: Props) {
     .slice(0, 3);
 
   return (
-    <div className="min-h-screen py-12">
+    <div className="min-h-screen">
       {/* Hero Image */}
       <div
-        className="relative h-[60vh] bg-cover bg-center"
+        className="relative h-[65vh] bg-cover bg-center"
         style={{ backgroundImage: `url('${article.thumbnail}')` }}
       >
         <div className="absolute inset-0 gradient-overlay" />
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 -mt-32 relative z-10">
+      <div className="max-w-3xl mx-auto px-6 lg:px-8 -mt-40 relative z-10">
         {/* Article Content */}
-        <article className="bg-barca-navy/95 backdrop-blur-sm border border-white/10 rounded-lg p-8 md:p-12">
+        <article className="glass-card rounded-2xl p-8 md:p-12">
           {/* Category & Date */}
-          <div className="flex items-center gap-4 mb-6 text-sm">
-            <span className="text-barca-blue uppercase tracking-wider">
+          <div className="flex items-center gap-4 mb-8">
+            <span className="tag text-barca-blue border-barca-blue/30">
               {article.category}
             </span>
-            <span className="text-gray-400">
+            <span className="text-[0.7rem] text-white/30 font-body">
               {new Date(article.date).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "long",
@@ -53,40 +53,47 @@ export default function NewsArticlePage({ params }: Props) {
           </div>
 
           {/* Title */}
-          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight">
+          <h1 className="font-display text-3xl md:text-5xl font-bold leading-tight tracking-tight mb-8">
             {article.title}
           </h1>
 
           {/* Excerpt */}
-          <p className="text-xl text-gray-300 mb-8 leading-relaxed">
+          <p className="text-lg text-white/50 font-body mb-10 leading-relaxed border-l-2 border-barca-blue/30 pl-6">
             {article.excerpt}
           </p>
 
+          {/* Divider */}
+          <div className="section-divider mb-10" />
+
           {/* Content */}
-          <div className="prose prose-invert prose-lg max-w-none">
+          <div className="space-y-6">
             {article.content.split("\n\n").map((paragraph, index) => (
-              <p key={index} className="mb-6 leading-relaxed text-gray-300">
+              <p
+                key={index}
+                className="text-white/40 font-body leading-[1.8] text-[0.95rem]"
+              >
                 {paragraph}
               </p>
             ))}
           </div>
 
           {/* Back Link */}
-          <div className="mt-12 pt-8 border-t border-white/10">
+          <div className="mt-12 pt-8">
+            <div className="section-divider mb-8" />
             <Link
               href="/news"
-              className="inline-flex items-center text-barca-blue hover:text-barca-red transition-colors font-medium"
+              className="inline-flex items-center gap-2 text-sm text-white/40 hover:text-white font-body font-medium transition-colors duration-300 group"
             >
               <svg
-                className="w-5 h-5 mr-2"
+                className="w-4 h-4 group-hover:-translate-x-1 transition-transform duration-300"
                 fill="none"
                 viewBox="0 0 24 24"
                 stroke="currentColor"
+                strokeWidth={1.5}
               >
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth={2}
                   d="M10 19l-7-7m0 0l7-7m-7 7h18"
                 />
               </svg>
@@ -97,21 +104,28 @@ export default function NewsArticlePage({ params }: Props) {
 
         {/* Related Articles */}
         {relatedArticles.length > 0 && (
-          <div className="mt-16">
-            <h2 className="text-3xl font-bold mb-8">Related Articles</h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="mt-20">
+            <h2 className="font-display text-2xl font-bold tracking-tight mb-8">
+              Related Articles
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               {relatedArticles.map((related) => (
                 <Link key={related.id} href={`/news/${related.slug}`}>
-                  <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden hover:border-barca-blue/50 transition-all group">
-                    <div
-                      className="h-40 bg-cover bg-center"
-                      style={{ backgroundImage: `url('${related.thumbnail}')` }}
-                    />
+                  <div className="glass-card rounded-xl overflow-hidden group">
+                    <div className="relative h-36 overflow-hidden">
+                      <div
+                        className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700"
+                        style={{
+                          backgroundImage: `url('${related.thumbnail}')`,
+                        }}
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-barca-navy to-transparent" />
+                    </div>
                     <div className="p-4">
-                      <div className="text-xs text-barca-blue uppercase tracking-wider mb-2">
+                      <span className="text-[0.6rem] uppercase tracking-[0.15em] text-barca-blue font-body">
                         {related.category}
-                      </div>
-                      <h3 className="font-bold group-hover:text-barca-blue transition-colors line-clamp-2">
+                      </span>
+                      <h3 className="font-display text-sm font-bold mt-1 leading-snug group-hover:text-barca-blue-light transition-colors line-clamp-2">
                         {related.title}
                       </h3>
                     </div>

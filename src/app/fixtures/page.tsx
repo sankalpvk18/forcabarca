@@ -42,7 +42,6 @@ export default function FixturesPage() {
         const response = await fetch("/api/fixtures");
         if (!response.ok) throw new Error("Failed to fetch fixtures");
         const data = await response.json();
-
         if (data.matches) {
           setMatches(data.matches);
         }
@@ -52,7 +51,6 @@ export default function FixturesPage() {
         setLoading(false);
       }
     }
-
     fetchFixtures();
   }, []);
 
@@ -61,35 +59,42 @@ export default function FixturesPage() {
       filter === "all" ||
       (filter === "upcoming" && ["SCHEDULED", "TIMED"].includes(match.status)) ||
       (filter === "completed" && match.status === "FINISHED");
-
     const compFilter =
       competition === "all" || match.competition.name.includes(competition);
-
     return statusFilter && compFilter;
   });
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen pt-28 flex items-center justify-center">
         <div className="text-center">
-          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-barca-blue"></div>
-          <p className="mt-4 text-gray-400">Loading fixtures...</p>
+          <div className="w-10 h-10 border-2 border-barca-blue/30 border-t-barca-blue rounded-full animate-spin mx-auto" />
+          <p className="mt-4 text-white/30 text-sm font-body">
+            Loading fixtures...
+          </p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen pt-28 pb-20">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
+          className="mb-14"
         >
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Fixtures & Results</h1>
-          <p className="text-gray-400 text-lg">FC Barcelona Match Schedule</p>
+          <span className="tag text-barca-gold border-barca-gold/30 mb-4 inline-block">
+            Schedule
+          </span>
+          <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight mb-3">
+            Fixtures & Results
+          </h1>
+          <p className="text-white/30 font-body text-lg">
+            FC Barcelona Match Schedule
+          </p>
         </motion.div>
 
         {/* Filters */}
@@ -97,20 +102,20 @@ export default function FixturesPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-8 flex flex-wrap gap-4"
+          className="mb-10 flex flex-wrap items-center gap-4"
         >
-          <div className="flex gap-2">
-            {["all", "upcoming", "completed"].map((f) => (
+          <div className="flex gap-1 p-1 bg-white/[0.03] rounded-xl border border-white/[0.06]">
+            {(["all", "upcoming", "completed"] as const).map((f) => (
               <button
                 key={f}
-                onClick={() => setFilter(f as typeof filter)}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                onClick={() => setFilter(f)}
+                className={`px-4 py-2 rounded-lg text-[0.75rem] font-body font-medium uppercase tracking-wider transition-all duration-300 ${
                   filter === f
-                    ? "bg-barca-blue text-white"
-                    : "bg-white/5 text-gray-400 hover:bg-white/10"
+                    ? "bg-barca-blue/20 text-white border border-barca-blue/30"
+                    : "text-white/30 hover:text-white/60 border border-transparent"
                 }`}
               >
-                {f.charAt(0).toUpperCase() + f.slice(1)}
+                {f}
               </button>
             ))}
           </div>
@@ -118,7 +123,7 @@ export default function FixturesPage() {
           <select
             value={competition}
             onChange={(e) => setCompetition(e.target.value)}
-            className="px-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:border-barca-blue"
+            className="px-4 py-2.5 bg-white/[0.03] border border-white/[0.06] rounded-xl text-sm text-white/60 font-body focus:outline-none focus:border-barca-blue/30 transition-colors appearance-none cursor-pointer"
           >
             <option value="all">All Competitions</option>
             <option value="Liga">La Liga</option>
@@ -127,10 +132,10 @@ export default function FixturesPage() {
           </select>
         </motion.div>
 
-        {/* Matches List */}
-        <div className="space-y-4">
+        {/* Matches */}
+        <div className="space-y-3">
           {filteredMatches.length === 0 ? (
-            <div className="text-center py-12 text-gray-400">
+            <div className="text-center py-20 text-white/30 font-body">
               No matches found for the selected filters.
             </div>
           ) : (
@@ -142,77 +147,82 @@ export default function FixturesPage() {
               return (
                 <motion.div
                   key={match.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6 hover:border-barca-blue/50 transition-all"
+                  transition={{ delay: index * 0.03 }}
+                  className="glass-card rounded-xl p-5 md:p-6 group"
                 >
-                  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-                    {/* Match Info */}
-                    <div className="flex-1">
-                      <div className="text-xs text-barca-blue uppercase tracking-wider mb-2">
-                        {match.competition.name} • Matchday {match.matchday}
+                  <div className="flex flex-col md:flex-row md:items-center gap-4">
+                    {/* Competition tag */}
+                    <div className="md:w-48 shrink-0">
+                      <span className="text-[0.6rem] uppercase tracking-[0.15em] text-white/25 font-body">
+                        {match.competition.name}
+                      </span>
+                      <p className="text-[0.7rem] text-white/20 font-body mt-0.5">
+                        Matchday {match.matchday}
+                      </p>
+                    </div>
+
+                    {/* Teams & Score */}
+                    <div className="flex-1 flex items-center gap-4">
+                      <div
+                        className={`flex-1 text-right font-body text-sm ${
+                          isBarcelonaHome
+                            ? "text-white font-semibold"
+                            : "text-white/60"
+                        }`}
+                      >
+                        {match.homeTeam.name}
                       </div>
 
-                      <div className="flex items-center gap-4 mb-2">
-                        {/* Home Team */}
-                        <div
-                          className={`flex-1 text-right ${
-                            isBarcelonaHome ? "font-bold" : ""
-                          }`}
-                        >
-                          {match.homeTeam.name}
-                        </div>
-
-                        {/* Score or VS */}
-                        <div className="text-2xl font-bold px-4">
-                          {isUpcoming ? (
-                            <span className="text-gray-400">vs</span>
-                          ) : (
-                            <span>
-                              {match.score.fullTime.home} - {match.score.fullTime.away}
-                            </span>
-                          )}
-                        </div>
-
-                        {/* Away Team */}
-                        <div
-                          className={`flex-1 text-left ${
-                            !isBarcelonaHome ? "font-bold" : ""
-                          }`}
-                        >
-                          {match.awayTeam.name}
-                        </div>
+                      <div className="w-24 text-center shrink-0">
+                        {isUpcoming ? (
+                          <span className="text-white/20 text-sm font-body">
+                            vs
+                          </span>
+                        ) : (
+                          <span className="font-display text-xl font-bold tracking-tight">
+                            {match.score.fullTime.home}{" "}
+                            <span className="text-white/20 mx-1">–</span>{" "}
+                            {match.score.fullTime.away}
+                          </span>
+                        )}
                       </div>
 
-                      <div className="text-sm text-gray-400">
+                      <div
+                        className={`flex-1 text-left font-body text-sm ${
+                          !isBarcelonaHome
+                            ? "text-white font-semibold"
+                            : "text-white/60"
+                        }`}
+                      >
+                        {match.awayTeam.name}
+                      </div>
+                    </div>
+
+                    {/* Date & Status */}
+                    <div className="flex items-center gap-3 md:w-56 shrink-0 md:justify-end">
+                      <span className="text-[0.7rem] text-white/20 font-body">
                         {isUpcoming
                           ? matchDate.toLocaleDateString("en-US", {
-                              weekday: "long",
-                              year: "numeric",
-                              month: "long",
+                              month: "short",
                               day: "numeric",
                               hour: "2-digit",
                               minute: "2-digit",
                             })
                           : matchDate.toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "long",
+                              month: "short",
                               day: "numeric",
                             })}
-                      </div>
-                    </div>
-
-                    {/* Status Badge */}
-                    <div>
+                      </span>
                       <span
-                        className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        className={`tag ${
                           isUpcoming
-                            ? "bg-blue-500/20 text-blue-400"
-                            : "bg-green-500/20 text-green-400"
+                            ? "text-barca-blue border-barca-blue/30"
+                            : "text-green-400 border-green-500/30"
                         }`}
                       >
-                        {isUpcoming ? "Upcoming" : "Full Time"}
+                        {isUpcoming ? "Upcoming" : "FT"}
                       </span>
                     </div>
                   </div>

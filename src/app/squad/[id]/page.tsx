@@ -25,98 +25,110 @@ export default function PlayerPage({ params }: Props) {
     <div className="min-h-screen">
       {/* Hero Section */}
       <div
-        className="relative h-[70vh] bg-cover bg-center"
+        className="relative h-[75vh] bg-cover bg-center"
         style={{ backgroundImage: `url('${player.image}')` }}
       >
         <div className="absolute inset-0 gradient-overlay" />
+        <div className="absolute bottom-0 left-0 w-[600px] h-[400px] bg-glow-blue opacity-20 blur-3xl" />
+
         <div className="absolute inset-0 flex items-end">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-12 w-full">
+          <div className="max-w-7xl mx-auto px-6 lg:px-8 pb-16 w-full">
             <div className="flex items-end gap-6">
-              <div className="w-24 h-24 bg-barca-blue rounded-full flex items-center justify-center text-4xl font-bold">
-                {player.number}
+              <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-barca-navy/80 backdrop-blur-sm border border-white/[0.08] flex items-center justify-center shrink-0">
+                <span className="font-display text-3xl md:text-4xl font-bold text-gradient-barca">
+                  {player.number}
+                </span>
               </div>
               <div>
-                <h1 className="text-5xl md:text-6xl font-bold mb-2">{player.name}</h1>
-                <p className="text-2xl text-gray-300">{player.position}</p>
+                <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-[0.95] mb-2">
+                  {player.name}
+                </h1>
+                <p className="text-white/40 font-body text-lg uppercase tracking-wider">
+                  {player.position}
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Content */}
-          <div className="lg:col-span-2">
+          <div className="lg:col-span-2 space-y-8">
             {/* Bio */}
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8 mb-8">
-              <h2 className="text-2xl font-bold mb-4">Biography</h2>
-              <p className="text-gray-300 leading-relaxed">{player.bio}</p>
+            <div className="glass-card rounded-2xl p-8">
+              <h2 className="font-display text-xl font-bold tracking-tight mb-5">
+                Biography
+              </h2>
+              <p className="text-white/40 font-body leading-[1.8] text-[0.95rem]">
+                {player.bio}
+              </p>
             </div>
 
             {/* Season Stats */}
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-8">
-              <h2 className="text-2xl font-bold mb-6">Season Statistics</h2>
+            <div className="glass-card rounded-2xl p-8">
+              <h2 className="font-display text-xl font-bold tracking-tight mb-8">
+                Season Statistics
+              </h2>
               <div className="grid grid-cols-3 gap-6">
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-barca-blue mb-2">
-                    {player.appearances}
+                {[
+                  { label: "Appearances", value: player.appearances },
+                  { label: "Goals", value: player.goals },
+                  { label: "Assists", value: player.assists },
+                ].map((stat) => (
+                  <div key={stat.label} className="text-center">
+                    <div className="font-display text-4xl md:text-5xl font-bold text-gradient-barca mb-2">
+                      {stat.value}
+                    </div>
+                    <div className="text-[0.65rem] text-white/30 uppercase tracking-[0.15em] font-body">
+                      {stat.label}
+                    </div>
                   </div>
-                  <div className="text-gray-400 text-sm uppercase tracking-wider">
-                    Appearances
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-barca-blue mb-2">
-                    {player.goals}
-                  </div>
-                  <div className="text-gray-400 text-sm uppercase tracking-wider">
-                    Goals
-                  </div>
-                </div>
-                <div className="text-center">
-                  <div className="text-4xl font-bold text-barca-blue mb-2">
-                    {player.assists}
-                  </div>
-                  <div className="text-gray-400 text-sm uppercase tracking-wider">
-                    Assists
-                  </div>
-                </div>
+                ))}
               </div>
             </div>
           </div>
 
           {/* Sidebar */}
-          <div>
+          <div className="space-y-6">
             {/* Player Info Card */}
-            <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg p-6 mb-8">
-              <h2 className="text-xl font-bold mb-6">Player Information</h2>
-              <div className="space-y-4">
-                <div className="flex justify-between py-3 border-b border-white/10">
-                  <span className="text-gray-400">Position</span>
-                  <span className="font-medium">{player.position}</span>
-                </div>
-                <div className="flex justify-between py-3 border-b border-white/10">
-                  <span className="text-gray-400">Number</span>
-                  <span className="font-medium">{player.number}</span>
-                </div>
-                <div className="flex justify-between py-3 border-b border-white/10">
-                  <span className="text-gray-400">Age</span>
-                  <span className="font-medium">{player.age}</span>
-                </div>
-                <div className="flex justify-between py-3">
-                  <span className="text-gray-400">Nationality</span>
-                  <span className="font-medium">{player.nationality}</span>
-                </div>
+            <div className="glass-card rounded-2xl p-6">
+              <h2 className="font-display text-lg font-bold tracking-tight mb-6">
+                Player Information
+              </h2>
+              <div className="space-y-0">
+                {[
+                  { label: "Position", value: player.position },
+                  { label: "Number", value: player.number },
+                  { label: "Age", value: player.age },
+                  { label: "Nationality", value: player.nationality },
+                ].map((item, index, arr) => (
+                  <div
+                    key={item.label}
+                    className={`flex justify-between py-4 ${
+                      index < arr.length - 1
+                        ? "border-b border-white/[0.04]"
+                        : ""
+                    }`}
+                  >
+                    <span className="text-sm text-white/30 font-body">
+                      {item.label}
+                    </span>
+                    <span className="text-sm font-body font-medium">
+                      {item.value}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
 
             {/* Back Link */}
             <Link
               href="/squad"
-              className="block bg-barca-blue hover:bg-barca-red text-white text-center px-6 py-3 rounded-lg font-semibold transition-colors"
+              className="block btn-primary text-center px-6 py-3.5 rounded-xl text-sm font-semibold tracking-wide uppercase"
             >
-              Back to Squad
+              <span className="relative z-10">Back to Squad</span>
             </Link>
           </div>
         </div>

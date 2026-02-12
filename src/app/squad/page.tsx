@@ -16,17 +16,22 @@ export default function SquadPage() {
       : squadData.filter((player) => player.position === selectedPosition);
 
   return (
-    <div className="min-h-screen py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen pt-28 pb-20">
+      <div className="max-w-7xl mx-auto px-6 lg:px-8">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
+          className="mb-14"
         >
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">First Team Squad</h1>
-          <p className="text-gray-400 text-lg">
-            2023/24 Season - FC Barcelona Players
+          <span className="tag text-barca-gold border-barca-gold/30 mb-4 inline-block">
+            2023/24
+          </span>
+          <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight mb-3">
+            First Team Squad
+          </h1>
+          <p className="text-white/30 font-body text-lg">
+            FC Barcelona Players
           </p>
         </motion.div>
 
@@ -35,16 +40,16 @@ export default function SquadPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-8 flex flex-wrap gap-2"
+          className="mb-10 flex flex-wrap gap-2"
         >
           {positions.map((position) => (
             <button
               key={position}
               onClick={() => setSelectedPosition(position)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+              className={`px-4 py-2 rounded-xl text-[0.75rem] font-body font-medium uppercase tracking-wider transition-all duration-300 ${
                 selectedPosition === position
-                  ? "bg-barca-blue text-white"
-                  : "bg-white/5 text-gray-400 hover:bg-white/10"
+                  ? "bg-barca-blue/20 text-white border border-barca-blue/30"
+                  : "text-white/30 hover:text-white/60 border border-white/[0.06] hover:border-white/[0.1]"
               }`}
             >
               {position}
@@ -53,53 +58,70 @@ export default function SquadPage() {
         </motion.div>
 
         {/* Players Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
           {filteredPlayers.map((player, index) => (
             <motion.div
               key={player.id}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: index * 0.05 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{
+                delay: index * 0.04,
+                duration: 0.5,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
             >
               <Link href={`/squad/${player.id}`}>
-                <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-lg overflow-hidden hover:border-barca-blue/50 transition-all hover:transform hover:-translate-y-2 group">
+                <div className="glass-card-glow rounded-2xl overflow-hidden group">
                   {/* Player Image */}
-                  <div className="relative h-64 bg-gradient-to-br from-barca-blue/20 to-barca-red/20">
+                  <div className="relative h-64 overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-barca-blue/10 to-barca-red/10" />
                     <div
-                      className="absolute inset-0 bg-cover bg-center"
+                      className="absolute inset-0 bg-cover bg-center group-hover:scale-105 transition-transform duration-700"
                       style={{ backgroundImage: `url('${player.image}')` }}
                     />
-                    <div className="absolute top-4 right-4 w-12 h-12 bg-barca-blue rounded-full flex items-center justify-center font-bold text-xl">
-                      {player.number}
+                    <div className="absolute inset-0 bg-gradient-to-t from-barca-navy via-transparent to-transparent" />
+
+                    {/* Number badge */}
+                    <div className="absolute top-4 right-4">
+                      <div className="w-10 h-10 rounded-xl bg-barca-navy/80 backdrop-blur-sm border border-white/[0.08] flex items-center justify-center">
+                        <span className="font-display text-sm font-bold text-barca-blue">
+                          {player.number}
+                        </span>
+                      </div>
                     </div>
                   </div>
 
                   {/* Player Info */}
-                  <div className="p-4">
-                    <h3 className="text-lg font-bold mb-1 group-hover:text-barca-blue transition-colors">
+                  <div className="p-5">
+                    <h3 className="font-display text-base font-bold mb-1 group-hover:text-barca-blue-light transition-colors duration-300">
                       {player.name}
                     </h3>
-                    <p className="text-sm text-gray-400 mb-3">{player.position}</p>
+                    <p className="text-[0.7rem] text-white/30 font-body uppercase tracking-wider mb-4">
+                      {player.position}
+                    </p>
 
-                    <div className="flex items-center justify-between text-xs text-gray-500">
+                    <div className="flex items-center justify-between text-[0.7rem] text-white/20 font-body mb-4">
                       <span>{player.nationality}</span>
-                      <span>{player.age} years</span>
+                      <span>{player.age} yrs</span>
                     </div>
 
                     {/* Stats */}
-                    <div className="mt-4 pt-4 border-t border-white/10 grid grid-cols-3 gap-2 text-center">
-                      <div>
-                        <div className="text-xs text-gray-400">Apps</div>
-                        <div className="font-bold text-sm">{player.appearances}</div>
-                      </div>
-                      <div>
-                        <div className="text-xs text-gray-400">Goals</div>
-                        <div className="font-bold text-sm">{player.goals}</div>
-                      </div>
-                      <div>
-                        <div className="text-xs text-gray-400">Assists</div>
-                        <div className="font-bold text-sm">{player.assists}</div>
-                      </div>
+                    <div className="section-divider mb-4" />
+                    <div className="grid grid-cols-3 gap-3 text-center">
+                      {[
+                        { label: "Apps", value: player.appearances },
+                        { label: "Goals", value: player.goals },
+                        { label: "Assists", value: player.assists },
+                      ].map((stat) => (
+                        <div key={stat.label}>
+                          <div className="font-display text-sm font-bold text-white/80">
+                            {stat.value}
+                          </div>
+                          <div className="text-[0.6rem] text-white/20 uppercase tracking-wider font-body mt-0.5">
+                            {stat.label}
+                          </div>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </div>
