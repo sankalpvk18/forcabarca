@@ -1,19 +1,14 @@
 import type { Metadata } from "next";
-import { Syne, Outfit } from "next/font/google";
+import { Lexend } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/Navigation";
 import Footer from "@/components/Footer";
 
-const syne = Syne({
+const lexend = Lexend({
   subsets: ["latin"],
-  variable: "--font-syne",
+  variable: "--font-lexend",
   display: "swap",
-});
-
-const outfit = Outfit({
-  subsets: ["latin"],
-  variable: "--font-outfit",
-  display: "swap",
+  weight: ["300", "400", "500", "600", "700", "800"],
 });
 
 export const metadata: Metadata = {
@@ -44,11 +39,14 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${syne.variable} ${outfit.variable}`}>
-      <body className="antialiased bg-barca-navy text-white min-h-screen font-body grain-overlay">
-        {/* Ambient background gradient mesh */}
-        <div className="fixed inset-0 bg-gradient-mesh pointer-events-none z-0" />
-
+    <html lang="en" className={lexend.variable}>
+      <head>
+        <link
+          href="https://fonts.googleapis.com/icon?family=Material+Icons"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="antialiased bg-background-dark text-slate-100 min-h-screen font-display">
         <div className="relative z-10">
           <Navigation />
           <main className="min-h-screen">{children}</main>

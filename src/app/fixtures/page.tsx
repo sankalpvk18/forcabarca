@@ -86,54 +86,61 @@ export default function FixturesPage() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-14"
         >
-          <span className="tag text-barca-gold border-barca-gold/30 mb-4 inline-block">
-            Schedule
-          </span>
-          <h1 className="font-display text-4xl md:text-6xl font-bold tracking-tight mb-3">
-            Fixtures & Results
+          <div className="flex items-center gap-2 text-primary font-semibold mb-2 uppercase text-xs tracking-[0.2em]">
+            <span className="w-8 h-[2px] bg-primary" />
+            Season 2023/24
+          </div>
+          <h1 className="font-display text-5xl font-extrabold tracking-tight mb-3">
+            Fixtures &{" "}
+            <span className="text-primary">Results</span>
           </h1>
-          <p className="text-white/30 font-body text-lg">
-            FC Barcelona Match Schedule
-          </p>
         </motion.div>
 
-        {/* Filters */}
+        {/* Filter Bar */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-10 flex flex-wrap items-center gap-4"
+          className="mb-10 glass-card p-4 rounded-xl flex flex-wrap items-center gap-6 border border-white/5"
         >
-          <div className="flex gap-1 p-1 bg-white/[0.03] rounded-xl border border-white/[0.06]">
-            {(["all", "upcoming", "completed"] as const).map((f) => (
-              <button
-                key={f}
-                onClick={() => setFilter(f)}
-                className={`px-4 py-2 rounded-lg text-[0.75rem] font-body font-medium uppercase tracking-wider transition-all duration-300 ${
-                  filter === f
-                    ? "bg-barca-blue/20 text-white border border-barca-blue/30"
-                    : "text-white/30 hover:text-white/60 border border-transparent"
-                }`}
-              >
-                {f}
-              </button>
-            ))}
+          {/* Status Filter */}
+          <div>
+            <label className="block text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1.5">
+              Status
+            </label>
+            <select
+              value={filter}
+              onChange={(e) =>
+                setFilter(e.target.value as "all" | "upcoming" | "completed")
+              }
+              className="px-4 py-2.5 bg-black/30 border border-white/10 rounded-lg text-sm text-white/80 font-body focus:outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer min-w-[160px]"
+            >
+              <option value="all">All Matches</option>
+              <option value="upcoming">Upcoming</option>
+              <option value="completed">Completed</option>
+            </select>
           </div>
 
-          <select
-            value={competition}
-            onChange={(e) => setCompetition(e.target.value)}
-            className="px-4 py-2.5 bg-white/[0.03] border border-white/[0.06] rounded-xl text-sm text-white/60 font-body focus:outline-none focus:border-barca-blue/30 transition-colors appearance-none cursor-pointer"
-          >
-            <option value="all">All Competitions</option>
-            <option value="Liga">La Liga</option>
-            <option value="Champions">Champions League</option>
-            <option value="Copa">Copa del Rey</option>
-          </select>
+          {/* Competition Filter */}
+          <div>
+            <label className="block text-[10px] uppercase tracking-widest text-slate-500 font-bold mb-1.5">
+              Competition
+            </label>
+            <select
+              value={competition}
+              onChange={(e) => setCompetition(e.target.value)}
+              className="px-4 py-2.5 bg-black/30 border border-white/10 rounded-lg text-sm text-white/80 font-body focus:outline-none focus:border-primary/50 transition-colors appearance-none cursor-pointer min-w-[180px]"
+            >
+              <option value="all">All Competitions</option>
+              <option value="Liga">La Liga</option>
+              <option value="Champions">Champions League</option>
+              <option value="Copa">Copa del Rey</option>
+            </select>
+          </div>
         </motion.div>
 
         {/* Matches */}
-        <div className="space-y-3">
+        <div className="space-y-4">
           {filteredMatches.length === 0 ? (
             <div className="text-center py-20 text-white/30 font-body">
               No matches found for the selected filters.
@@ -150,80 +157,140 @@ export default function FixturesPage() {
                   initial={{ opacity: 0, y: 15 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.03 }}
-                  className="glass-card rounded-xl p-5 md:p-6 group"
+                  className="glass-card rounded-xl overflow-hidden transition-all duration-300 group"
                 >
-                  <div className="flex flex-col md:flex-row md:items-center gap-4">
-                    {/* Competition tag */}
-                    <div className="md:w-48 shrink-0">
-                      <span className="text-[0.6rem] uppercase tracking-[0.15em] text-white/25 font-body">
+                  <div className="flex flex-col md:flex-row">
+                    {/* Left Info Panel */}
+                    <div className="md:w-1/4 p-5 md:p-6 bg-white/[0.02] border-b md:border-b-0 md:border-r border-white/5 flex flex-col justify-center">
+                      <span className="text-[10px] uppercase tracking-[0.15em] text-primary font-bold">
                         {match.competition.name}
                       </span>
-                      <p className="text-[0.7rem] text-white/20 font-body mt-0.5">
+                      <p className="text-[11px] text-slate-500 font-body mt-1">
                         Matchday {match.matchday}
                       </p>
+                      <p className="text-xs text-slate-400 font-body mt-2">
+                        {matchDate.toLocaleDateString("en-US", {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </p>
+                      {isUpcoming && (
+                        <p className="text-xs text-slate-500 font-body mt-0.5">
+                          {matchDate.toLocaleTimeString("en-US", {
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          })}
+                        </p>
+                      )}
                     </div>
 
-                    {/* Teams & Score */}
-                    <div className="flex-1 flex items-center gap-4">
-                      <div
-                        className={`flex-1 text-right font-body text-sm ${
-                          isBarcelonaHome
-                            ? "text-white font-semibold"
-                            : "text-white/60"
-                        }`}
-                      >
-                        {match.homeTeam.name}
+                    {/* Center Teams & Score */}
+                    <div className="flex-1 p-5 md:p-6 flex items-center justify-center gap-6">
+                      {/* Home Team */}
+                      <div className="flex-1 flex items-center justify-end gap-3">
+                        <span
+                          className={`font-bold text-lg text-right ${
+                            isBarcelonaHome ? "text-white" : "text-slate-400"
+                          }`}
+                        >
+                          {match.homeTeam.name}
+                        </span>
+                        <div
+                          className={`w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center shrink-0 ${
+                            isBarcelonaHome
+                              ? "border-l-4 border-l-primary"
+                              : ""
+                          }`}
+                        >
+                          {match.homeTeam.crest ? (
+                            <img
+                              src={match.homeTeam.crest}
+                              alt={match.homeTeam.name}
+                              className="w-6 h-6 object-contain"
+                            />
+                          ) : (
+                            <span className="material-icons text-slate-600 text-sm">
+                              shield
+                            </span>
+                          )}
+                        </div>
                       </div>
 
-                      <div className="w-24 text-center shrink-0">
+                      {/* Score / VS */}
+                      <div className="w-28 text-center shrink-0">
                         {isUpcoming ? (
-                          <span className="text-white/20 text-sm font-body">
-                            vs
-                          </span>
+                          <div>
+                            <span className="text-2xl font-light text-slate-600 uppercase tracking-widest">
+                              VS
+                            </span>
+                            <div className="mt-1">
+                              <span className="inline-block bg-primary/20 text-primary text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full">
+                                Upcoming
+                              </span>
+                            </div>
+                          </div>
                         ) : (
-                          <span className="font-display text-xl font-bold tracking-tight">
-                            {match.score.fullTime.home}{" "}
-                            <span className="text-white/20 mx-1">–</span>{" "}
-                            {match.score.fullTime.away}
-                          </span>
+                          <div>
+                            <span className="text-5xl font-black tracking-tight">
+                              {match.score.fullTime.home}
+                              <span className="text-slate-600 mx-1.5 text-3xl font-light">
+                                -
+                              </span>
+                              {match.score.fullTime.away}
+                            </span>
+                            <div className="mt-1">
+                              <span className="inline-block bg-green-500/20 text-green-400 text-[9px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full">
+                                FT
+                              </span>
+                            </div>
+                          </div>
                         )}
                       </div>
 
-                      <div
-                        className={`flex-1 text-left font-body text-sm ${
-                          !isBarcelonaHome
-                            ? "text-white font-semibold"
-                            : "text-white/60"
-                        }`}
-                      >
-                        {match.awayTeam.name}
+                      {/* Away Team */}
+                      <div className="flex-1 flex items-center gap-3">
+                        <div
+                          className={`w-10 h-10 rounded-lg bg-white/5 flex items-center justify-center shrink-0 ${
+                            !isBarcelonaHome
+                              ? "border-l-4 border-l-primary"
+                              : ""
+                          }`}
+                        >
+                          {match.awayTeam.crest ? (
+                            <img
+                              src={match.awayTeam.crest}
+                              alt={match.awayTeam.name}
+                              className="w-6 h-6 object-contain"
+                            />
+                          ) : (
+                            <span className="material-icons text-slate-600 text-sm">
+                              shield
+                            </span>
+                          )}
+                        </div>
+                        <span
+                          className={`font-bold text-lg ${
+                            !isBarcelonaHome ? "text-white" : "text-slate-400"
+                          }`}
+                        >
+                          {match.awayTeam.name}
+                        </span>
                       </div>
                     </div>
 
-                    {/* Date & Status */}
-                    <div className="flex items-center gap-3 md:w-56 shrink-0 md:justify-end">
-                      <span className="text-[0.7rem] text-white/20 font-body">
-                        {isUpcoming
-                          ? matchDate.toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })
-                          : matchDate.toLocaleDateString("en-US", {
-                              month: "short",
-                              day: "numeric",
-                            })}
-                      </span>
-                      <span
-                        className={`tag ${
-                          isUpcoming
-                            ? "text-barca-blue border-barca-blue/30"
-                            : "text-green-400 border-green-500/30"
-                        }`}
-                      >
-                        {isUpcoming ? "Upcoming" : "FT"}
-                      </span>
+                    {/* Right Action Panel */}
+                    <div className="md:w-48 p-5 md:p-6 bg-white/[0.02] border-t md:border-t-0 md:border-l border-white/5 flex items-center justify-center">
+                      {isUpcoming ? (
+                        <button className="w-full bg-primary/20 hover:bg-primary/40 text-primary text-xs font-bold uppercase tracking-widest px-4 py-3 rounded-lg transition-colors">
+                          Buy Tickets
+                        </button>
+                      ) : (
+                        <button className="w-full bg-white/5 hover:bg-white/10 text-slate-400 text-xs font-bold uppercase tracking-widest px-4 py-3 rounded-lg transition-colors">
+                          Match Center
+                        </button>
+                      )}
                     </div>
                   </div>
                 </motion.div>
@@ -231,6 +298,21 @@ export default function FixturesPage() {
             })
           )}
         </div>
+
+        {/* Load More */}
+        {filteredMatches.length > 0 && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="flex justify-center mt-12"
+          >
+            <button className="glass-card hover:bg-white/10 px-12 py-4 rounded-full font-bold text-sm tracking-widest uppercase flex items-center gap-2 transition-colors">
+              Load More
+              <span className="material-icons text-lg">expand_more</span>
+            </button>
+          </motion.div>
+        )}
       </div>
     </div>
   );
