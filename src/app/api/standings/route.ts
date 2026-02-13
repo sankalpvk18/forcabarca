@@ -12,8 +12,9 @@ export async function GET() {
     }
 
     // Determine current season (Aug+ = current year, otherwise previous year)
+    // Free api-football plan caps at 2024
     const now = new Date();
-    const season = now.getMonth() >= 7 ? now.getFullYear() : now.getFullYear() - 1;
+    const season = Math.min(now.getMonth() >= 7 ? now.getFullYear() : now.getFullYear() - 1, 2024);
 
     const response = await fetch(
       `https://v3.football.api-sports.io/standings?league=140&season=${season}`,
