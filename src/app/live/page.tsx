@@ -150,7 +150,7 @@ export default function LivePage() {
     );
   }
 
-  const isBarcelonaHome = liveMatch.homeTeam.id === 81;
+  const isBarcelonaHome = liveMatch.homeTeam.id === 529;
   const barcelonaScore = isBarcelonaHome
     ? liveMatch.score.fullTime.home
     : liveMatch.score.fullTime.away;

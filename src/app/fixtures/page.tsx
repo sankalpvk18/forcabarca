@@ -149,7 +149,7 @@ export default function FixturesPage() {
             filteredMatches.map((match, index) => {
               const matchDate = new Date(match.utcDate);
               const isUpcoming = ["SCHEDULED", "TIMED"].includes(match.status);
-              const isBarcelonaHome = match.homeTeam.id === 81;
+              const isBarcelonaHome = match.homeTeam.id === 529;
 
               return (
                 <motion.div
