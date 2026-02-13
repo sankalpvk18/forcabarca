@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import newsData from "@/data/news.json";
@@ -12,6 +12,21 @@ interface TimeRemaining {
   seconds: number;
 }
 
+interface NextMatchData {
+  type: "upcoming" | "completed" | "none";
+  match: {
+    id: number;
+    date: string;
+    status: string;
+    homeTeam: { id: number; name: string; logo: string };
+    awayTeam: { id: number; name: string; logo: string };
+    score: { home: number | null; away: number | null };
+    competition: string;
+    round: string;
+    venue: { name: string | null; city: string | null };
+  } | null;
+}
+
 export default function Home() {
   const [timeRemaining, setTimeRemaining] = useState<TimeRemaining>({
     days: 0,
@@ -19,14 +34,35 @@ export default function Home() {
     minutes: 0,
     seconds: 0,
   });
-
-  // Next match date (example - March 15, 2024)
-  const nextMatchDate = new Date("2024-03-15T20:00:00");
+  const [nextMatch, setNextMatch] = useState<NextMatchData | null>(null);
 
   useEffect(() => {
+    async function fetchNextMatch() {
+      try {
+        const res = await fetch("/api/next-match");
+        if (res.ok) {
+          const data = await res.json();
+          setNextMatch(data);
+        }
+      } catch {
+        // silently fail
+      }
+    }
+    fetchNextMatch();
+  }, []);
+
+  const getMatchDate = useCallback(() => {
+    if (nextMatch?.match?.date) return new Date(nextMatch.match.date);
+    return null;
+  }, [nextMatch]);
+
+  useEffect(() => {
+    const matchDate = getMatchDate();
+    if (!matchDate || nextMatch?.type !== "upcoming") return;
+
     const timer = setInterval(() => {
       const now = new Date();
-      const difference = nextMatchDate.getTime() - now.getTime();
+      const difference = matchDate.getTime() - now.getTime();
 
       if (difference > 0) {
         setTimeRemaining({
@@ -39,8 +75,7 @@ export default function Home() {
     }, 1000);
 
     return () => clearInterval(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [nextMatch, getMatchDate]);
 
   const latestNews = newsData.slice(0, 3);
 
@@ -71,7 +106,11 @@ export default function Home() {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="inline-block bg-accent-red text-white text-xs font-bold uppercase rounded mb-6 px-3 py-1.5 tracking-[0.2em]"
             >
-              Next Match: 2 days to go
+              {nextMatch?.type === "upcoming" && timeRemaining.days > 0
+                ? `Next Match: ${timeRemaining.days} day${timeRemaining.days !== 1 ? "s" : ""} to go`
+                : nextMatch?.type === "completed"
+                ? "Latest Result"
+                : "Matchday"}
             </motion.span>
 
             <motion.h1
@@ -127,38 +166,97 @@ export default function Home() {
             transition={{ duration: 0.6 }}
             className="lg:col-span-2 glass-card p-8 rounded-xl"
           >
-            <div className="flex items-center justify-between mb-6">
-              <div>
-                <h3 className="text-xs uppercase tracking-[0.2em] text-slate-500 font-bold mb-1">
-                  Next Match Countdown
-                </h3>
-                <p className="text-lg font-bold text-white">
-                  FC Barcelona vs Real Madrid
-                </p>
-              </div>
-              <span className="material-icons text-primary/40 text-3xl">
-                schedule
-              </span>
-            </div>
-            <div className="grid grid-cols-3 gap-4">
-              {[
-                { label: "Days", value: timeRemaining.days },
-                { label: "Hours", value: timeRemaining.hours },
-                { label: "Minutes", value: timeRemaining.minutes },
-              ].map((item) => (
-                <div
-                  key={item.label}
-                  className="text-center bg-black/30 rounded-lg py-5"
-                >
-                  <div className="text-4xl font-extrabold text-white tracking-tight">
-                    {String(item.value).padStart(2, "0")}
+            {nextMatch?.match ? (
+              <>
+                <div className="flex items-center justify-between mb-6">
+                  <div>
+                    <h3 className="text-xs uppercase tracking-[0.2em] text-slate-500 font-bold mb-1">
+                      {nextMatch.type === "upcoming"
+                        ? "Next Match Countdown"
+                        : "Latest Result"}
+                    </h3>
+                    <p className="text-lg font-bold text-white">
+                      {nextMatch.match.homeTeam.name} vs{" "}
+                      {nextMatch.match.awayTeam.name}
+                    </p>
+                    <div className="flex items-center gap-3 mt-1.5">
+                      <span className="text-[10px] uppercase tracking-[0.15em] text-primary font-bold">
+                        {nextMatch.match.competition}
+                      </span>
+                      {nextMatch.match.venue.name && (
+                        <>
+                          <span className="text-white/20">|</span>
+                          <span className="text-[10px] text-slate-500">
+                            {nextMatch.match.venue.name}
+                            {nextMatch.match.venue.city
+                              ? `, ${nextMatch.match.venue.city}`
+                              : ""}
+                          </span>
+                        </>
+                      )}
+                    </div>
                   </div>
-                  <div className="text-[10px] text-slate-500 uppercase tracking-widest mt-1 font-semibold">
-                    {item.label}
-                  </div>
+                  <span className="material-icons text-primary/40 text-3xl">
+                    {nextMatch.type === "upcoming"
+                      ? "schedule"
+                      : "sports_soccer"}
+                  </span>
                 </div>
-              ))}
-            </div>
+                {nextMatch.type === "upcoming" ? (
+                  <div className="grid grid-cols-3 gap-4">
+                    {[
+                      { label: "Days", value: timeRemaining.days },
+                      { label: "Hours", value: timeRemaining.hours },
+                      { label: "Minutes", value: timeRemaining.minutes },
+                    ].map((item) => (
+                      <div
+                        key={item.label}
+                        className="text-center bg-black/30 rounded-lg py-5"
+                      >
+                        <div className="text-4xl font-extrabold text-white tracking-tight">
+                          {String(item.value).padStart(2, "0")}
+                        </div>
+                        <div className="text-[10px] text-slate-500 uppercase tracking-widest mt-1 font-semibold">
+                          {item.label}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-center gap-6 bg-black/30 rounded-lg py-6">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={nextMatch.match.homeTeam.logo}
+                        alt={nextMatch.match.homeTeam.name}
+                        className="w-10 h-10 object-contain"
+                      />
+                      <span className="text-lg font-bold text-white/80">
+                        {nextMatch.match.homeTeam.name}
+                      </span>
+                    </div>
+                    <div className="text-4xl font-black text-white tracking-tight">
+                      {nextMatch.match.score.home ?? 0}
+                      <span className="text-white/20 mx-2">-</span>
+                      {nextMatch.match.score.away ?? 0}
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-lg font-bold text-white/80">
+                        {nextMatch.match.awayTeam.name}
+                      </span>
+                      <img
+                        src={nextMatch.match.awayTeam.logo}
+                        alt={nextMatch.match.awayTeam.name}
+                        className="w-10 h-10 object-contain"
+                      />
+                    </div>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="flex items-center justify-center py-10">
+                <div className="w-8 h-8 border-2 border-primary/30 border-t-primary rounded-full animate-spin" />
+              </div>
+            )}
           </motion.div>
 
           {/* Quick Stats Card */}
