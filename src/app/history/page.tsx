@@ -15,9 +15,8 @@ const categoryStyles: Record<string, { text: string; border: string; bg: string;
 export default function HistoryPage() {
   return (
     <div className="min-h-screen bg-background-dark">
-      {/* ── Header ── */}
+      {/* Header */}
       <header className="relative pt-24 pb-16 overflow-hidden text-center">
-        {/* Background image */}
         <img
           src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=1600&h=900&fit=crop"
           alt=""
@@ -44,14 +43,12 @@ export default function HistoryPage() {
         </motion.div>
       </header>
 
-      {/* ── Timeline ── */}
-      <section className="container mx-auto px-6 py-20 relative">
-        {/* Center vertical line */}
-        <div className="absolute inset-0 py-20 hidden md:block">
-          <div className="timeline-line relative w-full h-full" />
-        </div>
+      {/* Timeline */}
+      <section className="max-w-6xl mx-auto px-6 py-20 relative">
+        {/* Center vertical line (desktop only) */}
+        <div className="hidden md:block absolute left-1/2 top-20 bottom-20 w-px bg-gradient-to-b from-transparent via-primary/30 to-transparent" />
 
-        <div className="space-y-32">
+        <div className="space-y-24 md:space-y-32">
           {historyData.map((item, index) => {
             const isLeft = index % 2 === 0;
             const style = categoryStyles[item.category] || categoryStyles.milestone;
@@ -61,67 +58,84 @@ export default function HistoryPage() {
                 key={item.id}
                 initial={{ opacity: 0, y: 60 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-100px" }}
+                viewport={{ once: true, margin: "-80px" }}
                 transition={{
                   duration: 0.7,
                   ease: [0.25, 0.46, 0.45, 0.94],
                 }}
-                className="relative flex flex-col md:flex-row items-center justify-center"
+                className="relative"
               >
-                {/* ── Left half ── */}
-                <div
-                  className={`w-full md:w-1/2 ${
-                    isLeft ? "md:pr-16 md:text-right" : "md:pr-16 md:text-right md:order-1 hidden md:block"
-                  }`}
-                >
-                  {isLeft ? (
-                    <TimelineContent item={item} style={style} align="right" />
-                  ) : (
-                    <div />
-                  )}
-                </div>
-
-                {/* ── Center year circle ── */}
+                {/* Center year circle (desktop) */}
                 <motion.div
                   initial={{ scale: 0 }}
                   whileInView={{ scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ duration: 0.5, delay: 0.15, type: "spring", stiffness: 200 }}
-                  className="hidden md:flex absolute left-1/2 -translate-x-1/2 z-10 w-16 h-16 rounded-full bg-primary border-4 border-background-dark shadow-[0_0_30px_rgba(0,76,153,0.5)] items-center justify-center"
+                  className="hidden md:flex absolute left-1/2 -translate-x-1/2 top-8 z-10 w-14 h-14 rounded-full bg-primary border-4 border-background-dark shadow-[0_0_24px_rgba(0,76,153,0.4)] items-center justify-center"
                 >
-                  <span className="text-white font-black text-xl leading-none">
+                  <span className="text-white font-black text-lg leading-none">
                     {String(item.year).slice(-2)}
                   </span>
                 </motion.div>
 
-                {/* ── Right half ── */}
-                <div
-                  className={`w-full md:w-1/2 ${
-                    !isLeft ? "md:pl-16 md:text-left" : "md:pl-16 md:text-left md:order-2 hidden md:block"
-                  }`}
-                >
-                  {!isLeft ? (
-                    <TimelineContent item={item} style={style} align="left" />
-                  ) : (
-                    <div />
-                  )}
-                </div>
+                {/* Card layout */}
+                <div className={`md:flex md:items-start md:gap-0 ${isLeft ? "" : "md:flex-row-reverse"}`}>
+                  {/* Content side */}
+                  <div className={`md:w-1/2 ${isLeft ? "md:pr-14 md:text-right" : "md:pl-14"}`}>
+                    {/* Mobile year pill */}
+                    <div className="md:hidden mb-3">
+                      <span className="inline-block px-3 py-1 rounded-full bg-primary/20 text-primary text-sm font-bold">
+                        {item.year}
+                      </span>
+                    </div>
 
-                {/* Mobile fallback (always visible on small screens) */}
-                {isLeft ? null : (
-                  <div className="w-full md:hidden">
-                    <TimelineContent item={item} style={style} align="left" />
+                    {/* Category badge */}
+                    <div
+                      className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-4 border ${style.text} ${style.border} ${style.bg}`}
+                    >
+                      <span className="material-icons text-sm">{style.icon}</span>
+                      {item.category}
+                    </div>
+
+                    {/* Year (desktop - subtle) */}
+                    <div className="hidden md:block mb-2">
+                      <span className="text-sm font-bold text-white/30">{item.year}</span>
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="text-2xl md:text-3xl font-bold mb-3 leading-snug">
+                      {item.title}
+                    </h3>
+
+                    {/* Description */}
+                    <p
+                      className={`text-slate-400 leading-relaxed text-sm md:text-base ${
+                        isLeft ? "md:ml-auto" : ""
+                      } max-w-md ${isLeft ? "md:ml-auto" : ""}`}
+                    >
+                      {item.description}
+                    </p>
                   </div>
-                )}
+
+                  {/* Image side */}
+                  <div className={`md:w-1/2 mt-6 md:mt-0 ${isLeft ? "md:pl-14" : "md:pr-14"}`}>
+                    <div className="rounded-xl overflow-hidden border border-white/[0.06] group">
+                      <img
+                        src={item.image}
+                        alt={item.title}
+                        className="w-full h-56 md:h-64 object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                  </div>
+                </div>
               </motion.div>
             );
           })}
         </div>
       </section>
 
-      {/* ── Footer Coda ── */}
+      {/* Footer Coda */}
       <footer className="py-32 border-t border-slate-800 relative overflow-hidden">
-        {/* Giant watermark */}
         <span
           aria-hidden="true"
           className="absolute inset-0 flex items-center justify-center text-[20rem] md:text-[28rem] font-black uppercase leading-none text-white opacity-5 pointer-events-none select-none"
@@ -161,64 +175,6 @@ export default function HistoryPage() {
           </div>
         </motion.div>
       </footer>
-    </div>
-  );
-}
-
-/* ─────────────────── Timeline Content Card ─────────────────── */
-
-interface TimelineContentProps {
-  item: {
-    id: string;
-    year: number;
-    title: string;
-    description: string;
-    category: string;
-  };
-  style: { text: string; border: string; bg: string; icon: string };
-  align: "left" | "right";
-}
-
-function TimelineContent({ item, style, align }: TimelineContentProps) {
-  return (
-    <div>
-      {/* Category badge */}
-      <div
-        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider mb-4 border ${style.text} ${style.border} ${style.bg}`}
-      >
-        <span className="material-icons text-sm">{style.icon}</span>
-        {item.category}
-      </div>
-
-      {/* Mobile year pill */}
-      <div className="md:hidden mb-3">
-        <span className="inline-block px-3 py-1 rounded-full bg-primary/20 text-primary text-sm font-bold">
-          {item.year}
-        </span>
-      </div>
-
-      {/* Title */}
-      <h3 className="text-3xl font-bold italic mb-3 leading-snug">
-        {item.title}
-      </h3>
-
-      {/* Description */}
-      <p
-        className={`text-slate-400 leading-relaxed mb-6 ${
-          align === "right" ? "md:ml-auto" : ""
-        } max-w-md ${align === "right" ? "md:ml-auto" : ""}`}
-      >
-        {item.description}
-      </p>
-
-      {/* Image placeholder */}
-      <div className="rounded-xl overflow-hidden glass-card p-2">
-        <img
-          src="https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&h=400&fit=crop"
-          alt={item.title}
-          className="w-full h-64 object-cover rounded-lg"
-        />
-      </div>
     </div>
   );
 }
