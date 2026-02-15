@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 
+// Mark as dynamic to prevent static rendering at build time
+export const dynamic = 'force-dynamic';
+export const revalidate = 0;
+
 export async function GET() {
   try {
     const apiKey = process.env.FOOTBALL_DATA_API_KEY;

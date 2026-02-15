@@ -11,6 +11,11 @@ import {
   ScrapeMetadata,
 } from '@/lib/storage';
 
+// Mark as dynamic to prevent static rendering at build time
+export const dynamic = 'force-dynamic';
+export const runtime = 'nodejs';
+export const maxDuration = 60; // 60 seconds for scraping (requires Pro tier)
+
 /**
  * Vercel Cron Job Endpoint
  * Runs daily at 3 AM UTC to scrape galleries and update Blob storage

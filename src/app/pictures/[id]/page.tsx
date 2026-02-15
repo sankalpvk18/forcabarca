@@ -1,5 +1,8 @@
 "use client";
 
+// Mark as dynamic to prevent static rendering at build time
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";

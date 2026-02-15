@@ -1,5 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
+// Mark as dynamic to prevent static rendering at build time
+export const dynamic = 'force-dynamic';
+
 const ALLOWED_DOMAINS = [
   "www.fcbarcelona.com",
   "fcbarcelona.com",

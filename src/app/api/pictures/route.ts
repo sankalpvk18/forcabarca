@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { getGalleryList, isDataStale } from '@/lib/storage';
 
+// Mark as dynamic to prevent static rendering at build time
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   try {
     // Get gallery list from Blob storage

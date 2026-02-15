@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getGalleryDetail, isDataStale } from '@/lib/storage';
 
+// Mark as dynamic to prevent static rendering at build time
+export const dynamic = 'force-dynamic';
+
 export async function GET(
   request: NextRequest,
   { params }: { params: { id: string } }
