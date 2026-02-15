@@ -1,4 +1,4 @@
-import { Page, Browser } from 'puppeteer-core';
+import * as cheerio from 'cheerio';
 
 const BASE_URL = 'https://www.fcbarcelona.com';
 const GALLERIES_URL = `${BASE_URL}/en/football/first-team/photos`;
@@ -25,301 +25,198 @@ export interface GalleryDetail {
 }
 
 /**
- * Get browser instance - uses @sparticuz/chromium for production, puppeteer for dev
- */
-async function getBrowser(): Promise<Browser> {
-  if (process.env.NODE_ENV === 'production') {
-    // Production: Use serverless-optimized Chromium
-    try {
-      const chromium = (await import('@sparticuz/chromium')).default;
-      const puppeteerCore = await import('puppeteer-core');
-      const browser = await puppeteerCore.default.launch({
-        args: chromium.args,
-        defaultViewport: chromium.defaultViewport,
-        executablePath: await chromium.executablePath(),
-        headless: chromium.headless,
-      });
-      return browser as unknown as Browser;
-    } catch (error) {
-      console.error('[SCRAPER] Failed to launch serverless Chrome:', error);
-      throw error;
-    }
-  } else {
-    // Development: Use regular puppeteer
-    try {
-      const puppeteer = await import('puppeteer');
-      const browser = await puppeteer.default.launch({
-        headless: true,
-        args: [
-          '--no-sandbox',
-          '--disable-setuid-sandbox',
-          '--disable-dev-shm-usage',
-          '--disable-gpu',
-        ],
-      });
-      return browser as unknown as Browser;
-    } catch (error) {
-      console.error('[SCRAPER] Failed to launch puppeteer:', error);
-      throw error;
-    }
-  }
-}
-
-/**
- * Auto-scroll page to trigger lazy loading
- */
-async function autoScroll(page: Page): Promise<void> {
-  await page.evaluate(async () => {
-    await new Promise<void>((resolve) => {
-      let totalHeight = 0;
-      const distance = 400;
-      const timer = setInterval(() => {
-        const scrollHeight = document.body.scrollHeight;
-        window.scrollBy(0, distance);
-        totalHeight += distance;
-        if (totalHeight >= scrollHeight) {
-          clearInterval(timer);
-          resolve();
-        }
-      }, 200);
-    });
-  });
-}
-
-/**
- * Scrape gallery list from FC Barcelona's photos page
+ * Scrape gallery list from FC Barcelona's photos page using Cheerio
  */
 export async function scrapeGalleryList(): Promise<GalleryItem[]> {
-  const browser = await getBrowser();
-
   try {
-    const page = await browser.newPage();
-    await page.setUserAgent(
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-    );
-    await page.setViewport({ width: 1280, height: 800 });
-
-    console.log('[SCRAPER] Loading galleries page...');
-    await page.goto(GALLERIES_URL, {
-      waitUntil: 'networkidle2',
-      timeout: 30000,
+    console.log('[SCRAPER] Fetching galleries page...');
+    const response = await fetch(GALLERIES_URL, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      },
     });
 
-    // Wait for gallery content to load
-    await page.waitForSelector("a[href*='/photos/']", { timeout: 15000 });
-    await autoScroll(page);
-    // Give images a moment to lazy-load after scrolling
-    await new Promise((r) => setTimeout(r, 2000));
-
-    const galleries = await page.evaluate((baseUrl: string) => {
-      const items: Array<{
-        id: string;
-        title: string;
-        slug: string;
-        thumbnail: string;
-        date: string;
-        photoCount: number;
-        url: string;
-      }> = [];
-
-      // Find all gallery links
-      const links = document.querySelectorAll(
-        'a[href*="/football/first-team/photos/"]'
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch galleries page: ${response.status} ${response.statusText}`
       );
+    }
 
-      const seen = new Set<string>();
+    const html = await response.text();
+    const $ = cheerio.load(html);
 
-      links.forEach((link) => {
-        const href = link.getAttribute('href') || '';
-        // Match pattern: /en/football/first-team/photos/{id}/{slug}
-        const match = href.match(
-          /\/football\/first-team\/photos\/(\d+)\/(.+)/
-        );
-        if (!match) return;
+    const galleries: GalleryItem[] = [];
+    const seen = new Set<string>();
 
-        const id = match[1];
-        if (seen.has(id)) return;
-        seen.add(id);
+    $('a[href*="/football/first-team/photos/"]').each((_, element) => {
+      const href = $(element).attr('href') || '';
+      const match = href.match(/\/football\/first-team\/photos\/(\d+)\/(.+)/);
 
-        const slug = match[2];
+      if (!match) return;
 
-        // Find title - look for heading or prominent text
-        const titleEl =
-          link.querySelector("h2, h3, h4, [class*='title'], [class*='heading']") ||
-          link;
-        const title =
-          titleEl?.textContent?.trim().replace(/\s+/g, ' ') || `Gallery ${id}`;
+      const id = match[1];
+      if (seen.has(id)) return;
+      seen.add(id);
 
-        // Find thumbnail image
-        const img = link.querySelector('img');
-        let thumbnail = '';
-        if (img) {
-          thumbnail =
-            img.getAttribute('src') ||
-            img.getAttribute('data-src') ||
-            img.getAttribute('data-lazy-src') ||
-            '';
-        }
-        // Also check for background-image
-        if (!thumbnail) {
-          const bgEl = link.querySelector("[style*='background-image']");
-          if (bgEl) {
-            const style = bgEl.getAttribute('style') || '';
-            const bgMatch = style.match(/url\(['"]?(.+?)['"]?\)/);
-            if (bgMatch) thumbnail = bgMatch[1];
-          }
-        }
+      const slug = match[2];
 
-        // Make sure thumbnail is absolute URL
-        if (thumbnail && !thumbnail.startsWith('http')) {
-          thumbnail = baseUrl + thumbnail;
-        }
+      // Extract title from h2/h3/h4 or any element with 'title'/'heading' class
+      const titleEl = $(element)
+        .find("h2, h3, h4, [class*='title'], [class*='heading']")
+        .first();
+      let title =
+        titleEl.length > 0 ? titleEl.text() : $(element).text();
+      title = title
+        .trim()
+        .replace(/\s+/g, ' ')
+        .replace(/\d+\s*$/, '')
+        .trim() || `Gallery ${id}`;
 
-        // Try to find date and photo count from the text content
-        const text = link.textContent || '';
-        const dateMatch = text.match(
-          /(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{2,4})/i
-        );
-        const countMatch = text.match(/(\d+)\s*(?:photo|image|camera)/i);
+      // Extract thumbnail from img tag
+      const img = $(element).find('img').first();
+      let thumbnail =
+        img.attr('src') || img.attr('data-src') || img.attr('data-lazy-src') || '';
 
-        items.push({
-          id,
-          title: title.replace(/\d+\s*$/, '').trim() || `Gallery ${id}`,
-          slug,
-          thumbnail,
-          date: dateMatch ? dateMatch[1] : '',
-          photoCount: countMatch ? parseInt(countMatch[1]) : 0,
-          url: `${baseUrl}${href}`,
-        });
+      // Fallback: check background-image in style attribute
+      if (!thumbnail) {
+        const bgEl = $(element)
+          .find("[style*='background-image']")
+          .first();
+        const style = bgEl.attr('style') || '';
+        const bgMatch = style.match(/url\(['"]?(.+?)['"]?\)/);
+        if (bgMatch) thumbnail = bgMatch[1];
+      }
+
+      // Normalize thumbnail URL
+      if (thumbnail && !thumbnail.startsWith('http')) {
+        thumbnail = BASE_URL + thumbnail;
+      }
+
+      // Use placeholder if no thumbnail found
+      if (!thumbnail) {
+        thumbnail = 'https://www.fcbarcelona.com/favicon.ico';
+      }
+
+      // Extract date from text content
+      const text = $(element).text();
+      const dateMatch = text.match(
+        /(\d{1,2}\s+(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\s+\d{2,4})/i
+      );
+      const date = dateMatch ? dateMatch[1] : '';
+
+      // Extract photo count
+      const countMatch = text.match(/(\d+)\s*(?:photo|image|camera)/i);
+      const photoCount = countMatch ? parseInt(countMatch[1]) : 0;
+
+      galleries.push({
+        id,
+        title,
+        slug,
+        thumbnail,
+        date,
+        photoCount,
+        url: `${BASE_URL}${href}`,
       });
-
-      return items;
-    }, BASE_URL);
+    });
 
     console.log('[SCRAPER] Found', galleries.length, 'galleries');
     return galleries;
-  } finally {
-    await browser.close();
+  } catch (error) {
+    console.error('[SCRAPER] Error scraping gallery list:', error);
+    throw error;
   }
 }
 
 /**
- * Scrape images from a specific gallery
+ * Scrape images from a specific gallery using Cheerio
  */
 export async function scrapeGalleryImages(
   id: string,
   slug: string
 ): Promise<GalleryDetail> {
-  const browser = await getBrowser();
-
   try {
-    const page = await browser.newPage();
-    await page.setUserAgent(
-      'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36'
-    );
-    await page.setViewport({ width: 1280, height: 800 });
-
     const url = `${BASE_URL}/en/football/first-team/photos/${id}/${slug}`;
     console.log('[SCRAPER] Loading gallery:', url);
-    await page.goto(url, {
-      waitUntil: 'networkidle2',
-      timeout: 30000,
+
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent':
+          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+      },
     });
 
-    // Wait for images to appear
-    await page.waitForSelector('img', { timeout: 15000 });
-
-    // Auto-scroll to trigger lazy loading
-    for (let i = 0; i < 5; i++) {
-      await autoScroll(page);
-      await new Promise((r) => setTimeout(r, 1500));
+    if (!response.ok) {
+      throw new Error(
+        `Failed to fetch gallery page: ${response.status} ${response.statusText}`
+      );
     }
 
-    const result = await page.evaluate(
-      (args: { baseUrl: string; fallbackSlug: string }) => {
-        const { baseUrl, fallbackSlug } = args;
+    const html = await response.text();
+    const $ = cheerio.load(html);
 
-        // Get gallery title — avoid nav/header h1 elements like "Menu"
-        const titleEl =
-          document.querySelector(
-            "main h1, article h1, [class*='gallery'] h1, [class*='content'] h1, [class*='detail'] h1"
-          ) || document.querySelector('h1:not(nav h1):not(header h1)');
+    // Extract title - avoid nav/header h1 elements
+    const titleEl = $(
+      "main h1, article h1, [class*='gallery'] h1, [class*='content'] h1, [class*='detail'] h1"
+    ).first();
+    let title = titleEl.length > 0 ? titleEl.text().trim() : '';
 
-        let title = titleEl?.textContent?.trim() || '';
-        // If we got a generic nav word, fall back to slug
-        if (!title || title.toLowerCase() === 'menu' || title.length < 3) {
-          title = fallbackSlug
-            .replace(/-/g, ' ')
-            .replace(/\b\w/g, (c) => c.toUpperCase());
-        }
+    // Fallback to slug if title is generic or too short
+    if (!title || title.toLowerCase() === 'menu' || title.length < 3) {
+      title = slug
+        .replace(/-/g, ' ')
+        .replace(/\b\w/g, (c) => c.toUpperCase());
+    }
 
-        // Collect all gallery images
-        const images: Array<{ url: string; alt: string }> = [];
-        const seen = new Set<string>();
+    // Extract images
+    const images: GalleryImage[] = [];
+    const seen = new Set<string>();
 
-        const imgElements = document.querySelectorAll('img');
-        imgElements.forEach((img) => {
-          const src =
-            img.getAttribute('src') ||
-            img.getAttribute('data-src') ||
-            img.getAttribute('data-lazy-src') ||
-            '';
+    $('img').each((_, element) => {
+      const src =
+        $(element).attr('src') ||
+        $(element).attr('data-src') ||
+        $(element).attr('data-lazy-src') ||
+        '';
 
-          // Filter: only include photo-resources images (actual gallery photos)
-          // Exclude icons, logos, avatars, and tiny images
-          if (!src) return;
-          if (
-            src.includes('icon') ||
-            src.includes('logo') ||
-            src.includes('badge') ||
-            src.includes('avatar') ||
-            src.includes('sponsor')
-          )
-            return;
+      if (!src) return;
 
-          // Check natural size - skip tiny images (icons, etc.)
-          if (img.naturalWidth > 0 && img.naturalWidth < 100) return;
-          if (img.naturalHeight > 0 && img.naturalHeight < 100) return;
+      // Filter: exclude icons, logos, badges, avatars, sponsors
+      const excludeKeywords = [
+        'icon',
+        'logo',
+        'badge',
+        'avatar',
+        'sponsor',
+      ];
+      if (excludeKeywords.some((keyword) => src.includes(keyword))) return;
 
-          // Prefer photo-resources URLs but also accept other CDN images
-          const isGalleryImage =
-            src.includes('photo-resources') ||
-            src.includes('fcbarcelona') ||
-            (img.width > 200 && img.height > 150);
+      // Include only gallery images (photo-resources or fcbarcelona CDN)
+      const isGalleryImage =
+        src.includes('photo-resources') || src.includes('fcbarcelona');
 
-          if (!isGalleryImage) return;
+      if (!isGalleryImage) return;
 
-          // Get highest resolution by removing width/height params
-          let fullUrl = src;
-          if (fullUrl.includes('?')) {
-            const urlBase = fullUrl.split('?')[0];
-            fullUrl = urlBase;
-          }
-          if (!fullUrl.startsWith('http')) {
-            fullUrl = baseUrl + fullUrl;
-          }
+      // Normalize URL - remove query params for highest resolution
+      let fullUrl = src.split('?')[0];
+      if (!fullUrl.startsWith('http')) {
+        fullUrl = BASE_URL + fullUrl;
+      }
 
-          if (seen.has(fullUrl)) return;
-          seen.add(fullUrl);
+      // Deduplicate
+      if (seen.has(fullUrl)) return;
+      seen.add(fullUrl);
 
-          images.push({
-            url: fullUrl,
-            alt: img.getAttribute('alt') || '',
-          });
-        });
+      images.push({
+        url: fullUrl,
+        alt: $(element).attr('alt') || '',
+      });
+    });
 
-        return { title, images };
-      },
-      { baseUrl: BASE_URL, fallbackSlug: slug }
-    );
-
-    console.log('[SCRAPER] Found', result.images.length, 'images in gallery', id);
-    return {
-      id,
-      title: result.title,
-      images: result.images,
-    };
-  } finally {
-    await browser.close();
+    console.log('[SCRAPER] Found', images.length, 'images in gallery', id);
+    return { id, title, images };
+  } catch (error) {
+    console.error('[SCRAPER] Error scraping gallery images:', error);
+    throw error;
   }
 }
