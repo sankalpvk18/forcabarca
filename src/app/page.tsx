@@ -100,6 +100,20 @@ export default function Home() {
         {/* Content */}
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
           <div className="max-w-2xl">
+            {/* Brand identifier with gold decorative lines */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.1, duration: 1 }}
+              className="flex items-center gap-3 mb-5"
+            >
+              <div className="h-px w-8 bg-gradient-to-r from-transparent to-accent-gold/40" />
+              <span className="text-[10px] uppercase tracking-[0.3em] brand-gold-shimmer font-bold">
+                for&ccedil;abar&ccedil;a.club
+              </span>
+              <div className="h-px w-8 bg-gradient-to-l from-transparent to-accent-gold/40" />
+            </motion.div>
+
             <motion.span
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -150,6 +164,20 @@ export default function Home() {
               >
                 Buy Tickets
               </Link>
+            </motion.div>
+
+            {/* Community proof strip */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.9, duration: 1 }}
+              className="flex items-center gap-3 mt-10 text-[10px] uppercase tracking-[0.2em] text-white/25 font-semibold"
+            >
+              <span>Est. 1899</span>
+              <span className="brand-dot" />
+              <span>The Cul&eacute; Community</span>
+              <span className="brand-dot" />
+              <span>Join 2M+ Worldwide</span>
             </motion.div>
           </div>
         </div>
@@ -373,15 +401,15 @@ export default function Home() {
             Be Part of the Legend
           </h2>
           <p className="text-slate-400 text-lg max-w-2xl mx-auto mb-10">
-            Join thousands of cul&eacute;s worldwide. Get exclusive access to
-            match highlights, behind-the-scenes content, members-only events,
-            and priority ticket purchasing.
+            Join 2M+ cul&eacute;s on for&ccedil;abar&ccedil;a.club. Get
+            exclusive access to match highlights, behind-the-scenes content,
+            members-only events, and priority ticket purchasing.
           </p>
           <Link
             href="/fixtures"
             className="inline-flex items-center gap-2 bg-accent-gold hover:bg-yellow-500 text-background-dark px-8 py-4 rounded-lg font-black text-sm uppercase tracking-wider transition-colors"
           >
-            Join the Family
+            Join for&ccedil;abar&ccedil;a.club
           </Link>
         </div>
       </motion.section>

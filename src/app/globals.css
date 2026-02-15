@@ -226,4 +226,68 @@ body {
   .editorial-shadow {
     box-shadow: 0 4px 20px -2px rgba(0, 76, 153, 0.1);
   }
+
+  /* ── Brand Identity: forçabarça.club ── */
+
+  /* Gold gradient text for prestige accents */
+  .brand-gold-text {
+    background: linear-gradient(
+      135deg,
+      #edbb00 0%,
+      #f5d442 40%,
+      #edbb00 60%,
+      #c49a00 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Animated gold shimmer for hero brand identifier */
+  .brand-gold-shimmer {
+    background: linear-gradient(
+      90deg,
+      #c49a00 0%,
+      #edbb00 20%,
+      #fff5c0 50%,
+      #edbb00 80%,
+      #c49a00 100%
+    );
+    background-size: 200% 100%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: goldShimmer 6s ease-in-out infinite;
+  }
+
+  /* Thin gold decorative line */
+  .brand-line {
+    height: 1px;
+    background: linear-gradient(90deg, rgba(237, 187, 0, 0.4), rgba(237, 187, 0, 0.08));
+  }
+
+  /* Premium badge container with gold border */
+  .brand-badge {
+    border: 1px solid rgba(237, 187, 0, 0.15);
+    background: rgba(237, 187, 0, 0.02);
+  }
+
+  /* Gold dot separator */
+  .brand-dot {
+    display: inline-block;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: rgba(237, 187, 0, 0.4);
+  }
+}
+
+@keyframes goldShimmer {
+  0%,
+  100% {
+    background-position: 200% 50%;
+  }
+  50% {
+    background-position: 0% 50%;
+  }
 }
