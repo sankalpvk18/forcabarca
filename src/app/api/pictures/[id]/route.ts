@@ -1,8 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getCache, setCache } from "@/lib/cache";
-import { scrapeGalleryImages, GalleryDetail } from "@/lib/scraper";
-
-const CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
+import { NextRequest, NextResponse } from 'next/server';
+import { getGalleryDetail, isDataStale } from '@/lib/storage';
 
 export async function GET(
   request: NextRequest,
@@ -10,40 +7,34 @@ export async function GET(
 ) {
   try {
     const id = params.id;
-    const slug = request.nextUrl.searchParams.get("slug") || "";
-    const refresh = request.nextUrl.searchParams.get("refresh") === "true";
-    const cacheKey = `gallery-${id}`;
 
-    if (!refresh) {
-      const cached = getCache<GalleryDetail>(cacheKey);
-      if (cached) {
-        return NextResponse.json({ gallery: cached, fromCache: true });
-      }
-    }
+    // Get gallery detail from Blob storage
+    const data = await getGalleryDetail(id);
 
-    if (!slug) {
+    if (!data) {
       return NextResponse.json(
-        { error: "Missing slug parameter" },
-        { status: 400 }
+        {
+          error: 'Gallery not found',
+          message:
+            'This gallery has not been scraped yet. Please check the gallery list.',
+        },
+        { status: 404 }
       );
     }
 
-    const gallery = await scrapeGalleryImages(id, slug);
+    // Check if data is stale (older than 48 hours)
+    const stale = isDataStale(data.lastUpdated, 48);
 
-    if (gallery.images.length > 0) {
-      setCache(cacheKey, gallery, CACHE_TTL);
-    }
-
-    return NextResponse.json({ gallery, fromCache: false });
+    return NextResponse.json({
+      gallery: data.gallery,
+      lastUpdated: data.lastUpdated,
+      stale,
+      imageCount: data.gallery.images.length,
+    });
   } catch (error) {
-    console.error("Error fetching gallery images:", error);
-    const id = params.id;
-    const stale = getCache<GalleryDetail>(`gallery-${id}`);
-    if (stale) {
-      return NextResponse.json({ gallery: stale, fromCache: true, stale: true });
-    }
+    console.error('[API] Error fetching gallery images:', error);
     return NextResponse.json(
-      { error: "Failed to fetch gallery images" },
+      { error: 'Failed to fetch gallery images' },
       { status: 500 }
     );
   }

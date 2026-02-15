@@ -1,37 +1,35 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getCache, setCache } from "@/lib/cache";
-import { scrapeGalleryList, GalleryItem } from "@/lib/scraper";
+import { NextResponse } from 'next/server';
+import { getGalleryList, isDataStale } from '@/lib/storage';
 
-const CACHE_KEY = "galleries-list";
-const CACHE_TTL = 60 * 60 * 1000; // 1 hour
-
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
-    const refresh = request.nextUrl.searchParams.get("refresh") === "true";
+    // Get gallery list from Blob storage
+    const data = await getGalleryList();
 
-    if (!refresh) {
-      const cached = getCache<GalleryItem[]>(CACHE_KEY);
-      if (cached) {
-        return NextResponse.json({ galleries: cached, fromCache: true });
-      }
+    if (!data) {
+      return NextResponse.json(
+        {
+          error: 'No gallery data available',
+          message:
+            'Galleries are being scraped. Please check back in a few minutes.',
+        },
+        { status: 503 }
+      );
     }
 
-    const galleries = await scrapeGalleryList();
+    // Check if data is stale (older than 24 hours)
+    const stale = isDataStale(data.lastUpdated, 24);
 
-    if (galleries.length > 0) {
-      setCache(CACHE_KEY, galleries, CACHE_TTL);
-    }
-
-    return NextResponse.json({ galleries, fromCache: false });
+    return NextResponse.json({
+      galleries: data.galleries,
+      lastUpdated: data.lastUpdated,
+      stale,
+      count: data.scrapedCount,
+    });
   } catch (error) {
-    console.error("Error fetching galleries:", error);
-    // Try to return stale cache on error
-    const stale = getCache<GalleryItem[]>(CACHE_KEY);
-    if (stale) {
-      return NextResponse.json({ galleries: stale, fromCache: true, stale: true });
-    }
+    console.error('[API] Error fetching galleries:', error);
     return NextResponse.json(
-      { error: "Failed to fetch galleries" },
+      { error: 'Failed to fetch galleries' },
       { status: 500 }
     );
   }
