@@ -60,6 +60,7 @@ export async function saveGalleryList(
     await put(`${BLOB_STORE_PATH}/list.json`, JSON.stringify(data, null, 2), {
       contentType: 'application/json',
       access: 'public',
+      allowOverwrite: true,
     });
 
     console.log('[BLOB] Saved gallery list:', galleries.length, 'items');
@@ -105,6 +106,7 @@ export async function saveGalleryDetail(
       {
         contentType: 'application/json',
         access: 'public',
+        allowOverwrite: true,
       }
     );
 
@@ -147,6 +149,7 @@ export async function updateScrapeMetadata(
       {
         contentType: 'application/json',
         access: 'public',
+        allowOverwrite: true,
       }
     );
 
