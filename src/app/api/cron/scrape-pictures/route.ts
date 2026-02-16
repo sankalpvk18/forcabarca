@@ -112,13 +112,25 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Step 3: Scrape individual galleries (limit to top 10 to avoid timeout)
-    console.log('[CRON] Step 3: Scraping top 10 galleries...');
-    const topGalleries = galleries.slice(0, 10);
+    // Step 3: Scrape individual galleries
+    // On each run, scrape galleries sequentially until ~8 seconds remaining
+    // This allows continuous progress through all galleries across multiple cron runs
+    console.log('[CRON] Step 3: Scraping galleries with time-aware batching...');
     let successCount = 0;
     let failureCount = 0;
+    const timeLimit = 8000; // Reserve 8 seconds for other operations, use remaining for scraping
+    const SCRAPE_TIME_PER_GALLERY = 300; // Estimated ms per gallery (Browserless ~200-300ms)
 
-    for (const gallery of topGalleries) {
+    for (const gallery of galleries) {
+      const elapsedTime = Date.now() - startTime;
+      const remainingTime = timeLimit - elapsedTime;
+
+      // Stop if we're running low on time
+      if (remainingTime < SCRAPE_TIME_PER_GALLERY) {
+        console.log(`[CRON] Stopping scrape - running low on time. Elapsed: ${elapsedTime}ms, Remaining: ${remainingTime}ms`);
+        break;
+      }
+
       try {
         console.log(`[CRON] Scraping gallery ${gallery.id}: ${gallery.title}...`);
         const galleryDetail = await scrapeGalleryImages(
@@ -172,7 +184,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       {
         status: metadata.lastScrapeStatus,
-        message: `Scraped ${successCount}/${topGalleries.length} galleries`,
+        message: `Scraped ${successCount}/${galleries.length} galleries`,
         metadata,
         duration,
       },
