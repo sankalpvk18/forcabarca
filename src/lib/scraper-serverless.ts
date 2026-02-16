@@ -91,10 +91,21 @@ export async function scrapeGalleryList(): Promise<GalleryItem[]> {
         .replace(/\d+\s*$/, '')
         .trim() || `Gallery ${id}`;
 
-      // Extract thumbnail from img tag
-      const img = $(element).find('img').first();
-      let thumbnail =
-        img.attr('src') || img.attr('data-src') || img.attr('data-lazy-src') || '';
+      // Extract thumbnail from picture element (FC Barcelona uses data-img-src)
+      let thumbnail = '';
+
+      // Primary: check picture element for data-img-src
+      const picture = $(element).find('picture').first();
+      if (picture.length > 0) {
+        thumbnail = picture.attr('data-img-src') || '';
+      }
+
+      // Fallback: check img tag attributes
+      if (!thumbnail) {
+        const img = $(element).find('img').first();
+        thumbnail =
+          img.attr('src') || img.attr('data-src') || img.attr('data-lazy-src') || '';
+      }
 
       // Fallback: check background-image in style attribute
       if (!thumbnail) {
