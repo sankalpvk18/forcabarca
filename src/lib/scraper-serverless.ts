@@ -29,17 +29,35 @@ export interface GalleryDetail {
  */
 export async function scrapeGalleryList(): Promise<GalleryItem[]> {
   try {
-    console.log('[SCRAPER] Fetching galleries page...');
-    const response = await fetch(GALLERIES_URL, {
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      },
+    console.log('[SCRAPER] Fetching galleries page with Browserless...');
+
+    const browserlessToken = process.env.BROWSERLESS_TOKEN;
+    if (!browserlessToken) {
+      throw new Error('BROWSERLESS_TOKEN environment variable not set');
+    }
+
+    // Use Browserless to render JavaScript-loaded thumbnails
+    const browserlessUrl = `https://production-sfo.browserless.io/content?token=${browserlessToken}`;
+    const response = await fetch(browserlessUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url: GALLERIES_URL,
+        waitForSelector: {
+          selector: 'a[href*="/football/first-team/photos/"]',
+          timeout: 10000,
+        },
+        bestAttempt: true,
+      }),
     });
 
+    console.log('[SCRAPER] Browserless response status:', response.status, response.statusText);
+
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[SCRAPER] Browserless error response:', errorText);
       throw new Error(
-        `Failed to fetch galleries page: ${response.status} ${response.statusText}`
+        `Failed to fetch galleries page with Browserless: ${response.status} ${response.statusText} - ${errorText}`
       );
     }
 
