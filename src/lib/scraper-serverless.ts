@@ -129,7 +129,7 @@ export async function scrapeGalleryList(): Promise<GalleryItem[]> {
 }
 
 /**
- * Scrape images from a specific gallery using Cheerio
+ * Scrape images from a specific gallery using Browserless for JavaScript rendering
  */
 export async function scrapeGalleryImages(
   id: string,
@@ -137,18 +137,29 @@ export async function scrapeGalleryImages(
 ): Promise<GalleryDetail> {
   try {
     const url = `${BASE_URL}/en/football/first-team/photos/${id}/${slug}`;
-    console.log('[SCRAPER] Loading gallery:', url);
+    console.log('[SCRAPER] Loading gallery with Browserless:', url);
 
-    const response = await fetch(url, {
-      headers: {
-        'User-Agent':
-          'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
-      },
+    const browserlessToken = process.env.BROWSERLESS_TOKEN;
+    if (!browserlessToken) {
+      throw new Error('BROWSERLESS_TOKEN environment variable not set');
+    }
+
+    // Use Browserless to get rendered HTML with JavaScript-loaded images
+    const browserlessUrl = `https://chrome.browserless.io/content?token=${browserlessToken}`;
+    const response = await fetch(browserlessUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        url,
+        waitFor: 'img[src*="photo-resources"], img[src*="fcbarcelona"]', // Wait for gallery images to load
+        timeout: 30000,
+        bestAttempt: true, // Continue even if wait condition not met
+      }),
     });
 
     if (!response.ok) {
       throw new Error(
-        `Failed to fetch gallery page: ${response.status} ${response.statusText}`
+        `Browserless request failed: ${response.status} ${response.statusText}`
       );
     }
 
@@ -168,7 +179,7 @@ export async function scrapeGalleryImages(
         .replace(/\b\w/g, (c) => c.toUpperCase());
     }
 
-    // Extract images
+    // Extract images from the rendered HTML
     const images: GalleryImage[] = [];
     const seen = new Set<string>();
 
