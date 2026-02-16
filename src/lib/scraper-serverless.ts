@@ -145,14 +145,14 @@ export async function scrapeGalleryImages(
     }
 
     // Use Browserless to get rendered HTML with JavaScript-loaded images
-    const browserlessUrl = `https://chrome.browserless.io/content?token=${browserlessToken}`;
+    const browserlessUrl = `https://production-sfo.browserless.io/content?token=${browserlessToken}`;
     const response = await fetch(browserlessUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         url,
-        waitFor: 'img[src*="photo-resources"], img[src*="fcbarcelona"]', // Wait for gallery images to load
-        timeout: 30000,
+        waitForSelector: 'img[src*="photo-resources"]', // Wait for gallery images to load
+        waitForTimeout: 15000, // 15 seconds max wait
         bestAttempt: true, // Continue even if wait condition not met
       }),
     });
