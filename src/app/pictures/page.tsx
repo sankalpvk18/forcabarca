@@ -14,6 +14,24 @@ interface Gallery {
   url: string;
 }
 
+/**
+ * Validate that a string is a proper URL
+ */
+function isValidUrl(urlString: string): boolean {
+  // Check for empty or favicon fallback
+  if (!urlString || urlString.includes('favicon.ico')) {
+    return false;
+  }
+
+  // Check for valid URL format
+  try {
+    const url = new URL(urlString);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
 export default function PicturesPage() {
   const [galleries, setGalleries] = useState<Gallery[]>([]);
   const [loading, setLoading] = useState(true);
@@ -162,11 +180,11 @@ export default function PicturesPage() {
                     >
                       <div className="rounded-xl bg-primary/5 editorial-shadow transition-all hover:-translate-y-1 overflow-hidden">
                         <div className="relative aspect-[16/9] overflow-hidden">
-                          {gallery.thumbnail ? (
+                          {gallery.thumbnail && isValidUrl(gallery.thumbnail) ? (
                             <div
                               className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                               style={{
-                                backgroundImage: `url('${gallery.thumbnail}')`,
+                                backgroundImage: `url("${gallery.thumbnail}")`,
                               }}
                             />
                           ) : (
@@ -225,11 +243,11 @@ export default function PicturesPage() {
                   <Link href={`/pictures/${gallery.id}?slug=${gallery.slug}`}>
                     <div className="rounded-xl bg-primary/5 editorial-shadow transition-all hover:-translate-y-1 overflow-hidden">
                       <div className="relative aspect-[4/3] overflow-hidden">
-                        {gallery.thumbnail ? (
+                        {gallery.thumbnail && isValidUrl(gallery.thumbnail) ? (
                           <div
                             className="absolute inset-0 bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
                             style={{
-                              backgroundImage: `url('${gallery.thumbnail}')`,
+                              backgroundImage: `url("${gallery.thumbnail}")`,
                             }}
                           />
                         ) : (
