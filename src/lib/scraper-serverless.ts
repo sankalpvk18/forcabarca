@@ -148,8 +148,10 @@ export async function scrapeGalleryImages(
     const browserlessUrl = `https://production-sfo.browserless.io/content?token=${browserlessToken}`;
     const requestBody = {
       url,
-      waitForSelector: 'img[src*="photo-resources"]', // Wait for gallery images to load
-      waitForTimeout: 15000, // 15 seconds max wait
+      waitForSelector: {
+        selector: 'img[src*="photo-resources"]', // Wait for gallery images to load
+        timeout: 15000, // 15 seconds max wait
+      },
       bestAttempt: true, // Continue even if wait condition not met
     };
 
