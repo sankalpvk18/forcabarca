@@ -8,6 +8,7 @@ import {
   saveGalleryList,
   saveGalleryDetail,
   updateScrapeMetadata,
+  updateGalleryThumbnail,
   ScrapeMetadata,
 } from '@/lib/storage';
 
@@ -140,6 +141,14 @@ export async function GET(request: NextRequest) {
 
         // Save individual gallery to Blob
         await saveGalleryDetail(gallery.id, galleryDetail);
+
+        // Use first image as thumbnail for gallery list
+        if (galleryDetail.images.length > 0) {
+          const thumbnail = galleryDetail.images[0].url;
+          await updateGalleryThumbnail(gallery.id, thumbnail);
+          console.log(`[CRON] Updated thumbnail for gallery ${gallery.id}`);
+        }
+
         console.log(`[CRON] Successfully saved gallery ${gallery.id}`);
         successCount++;
       } catch (error) {

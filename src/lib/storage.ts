@@ -118,6 +118,40 @@ export async function saveGalleryDetail(
 }
 
 /**
+ * Update a specific gallery's thumbnail in the gallery list
+ */
+export async function updateGalleryThumbnail(
+  id: string,
+  thumbnail: string
+): Promise<void> {
+  try {
+    // Get current gallery list
+    const data = await getGalleryList();
+    if (!data) {
+      console.warn('[BLOB] No gallery list found, cannot update thumbnail');
+      return;
+    }
+
+    // Find and update the gallery
+    const galleryIndex = data.galleries.findIndex((g) => g.id === id);
+    if (galleryIndex === -1) {
+      console.warn(`[BLOB] Gallery ${id} not found in list`);
+      return;
+    }
+
+    // Update thumbnail
+    data.galleries[galleryIndex].thumbnail = thumbnail;
+
+    // Save updated list
+    await saveGalleryList(data.galleries);
+    console.log('[BLOB] Updated thumbnail for gallery:', id);
+  } catch (error) {
+    console.error('[BLOB] Error updating gallery thumbnail:', id, error);
+    // Don't throw - this is a non-critical update
+  }
+}
+
+/**
  * Get individual gallery detail from Blob storage
  */
 export async function getGalleryDetail(
