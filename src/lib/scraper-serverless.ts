@@ -44,8 +44,8 @@ export async function scrapeGalleryList(): Promise<GalleryItem[]> {
       body: JSON.stringify({
         url: GALLERIES_URL,
         waitForSelector: {
-          selector: 'a[href*="/football/first-team/photos/"]',
-          timeout: 10000,
+          selector: 'img',
+          timeout: 15000, // Increased timeout to allow more time for images to load
         },
         bestAttempt: true,
       }),
