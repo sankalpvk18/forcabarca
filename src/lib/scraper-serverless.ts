@@ -146,20 +146,29 @@ export async function scrapeGalleryImages(
 
     // Use Browserless to get rendered HTML with JavaScript-loaded images
     const browserlessUrl = `https://production-sfo.browserless.io/content?token=${browserlessToken}`;
+    const requestBody = {
+      url,
+      waitForSelector: 'img[src*="photo-resources"]', // Wait for gallery images to load
+      waitForTimeout: 15000, // 15 seconds max wait
+      bestAttempt: true, // Continue even if wait condition not met
+    };
+
+    console.log('[SCRAPER] Browserless request URL:', browserlessUrl.replace(browserlessToken, 'TOKEN_HIDDEN'));
+    console.log('[SCRAPER] Browserless request body:', JSON.stringify(requestBody));
+
     const response = await fetch(browserlessUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        url,
-        waitForSelector: 'img[src*="photo-resources"]', // Wait for gallery images to load
-        waitForTimeout: 15000, // 15 seconds max wait
-        bestAttempt: true, // Continue even if wait condition not met
-      }),
+      body: JSON.stringify(requestBody),
     });
 
+    console.log('[SCRAPER] Browserless response status:', response.status, response.statusText);
+
     if (!response.ok) {
+      const errorText = await response.text();
+      console.error('[SCRAPER] Browserless error response:', errorText);
       throw new Error(
-        `Browserless request failed: ${response.status} ${response.statusText}`
+        `Browserless request failed: ${response.status} ${response.statusText} - ${errorText}`
       );
     }
 
