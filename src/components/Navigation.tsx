@@ -11,6 +11,7 @@ const navLinks = [
   { href: "/fixtures", label: "Fixtures" },
   { href: "/live", label: "Live" },
   { href: "/news", label: "News" },
+  { href: "/pictures", label: "Pictures" },
   { href: "/squad", label: "Squad" },
   { href: "/history", label: "History" },
 ];
@@ -76,14 +77,22 @@ export default function Navigation() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-              <span className="text-white font-display font-bold text-sm tracking-tight">
-                FCB
+            {/* Gold-bordered premium monogram */}
+            <div className="relative w-10 h-10 rounded-lg bg-gradient-to-br from-accent-gold to-yellow-700 p-[1.5px] group-hover:scale-105 transition-transform duration-300">
+              <div className="w-full h-full rounded-[7px] bg-background-dark flex items-center justify-center">
+                <span className="brand-gold-text font-display font-extrabold text-sm tracking-tight">
+                  fB
+                </span>
+              </div>
+            </div>
+            <div className="hidden sm:flex flex-col">
+              <span className="font-display text-[15px] font-bold uppercase tracking-[0.08em] text-white leading-none">
+                for&ccedil;abar&ccedil;a<span className="brand-gold-text font-semibold text-xs ml-0.5 lowercase">.club</span>
+              </span>
+              <span className="text-[9px] uppercase tracking-[0.2em] text-white/25 font-medium mt-1">
+                The Cul&eacute; Community
               </span>
             </div>
-            <span className="hidden sm:block font-display text-lg font-bold uppercase tracking-tight text-white">
-              FC BARCELONA
-            </span>
           </Link>
 
           {/* Desktop Navigation */}

@@ -69,26 +69,48 @@ export default function Footer() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 mb-16">
           {/* Brand column */}
           <div className="lg:col-span-1">
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 bg-primary/50 rounded-lg flex items-center justify-center opacity-50 grayscale">
-                <span className="text-white font-display font-bold text-sm">
-                  FCB
-                </span>
+            {/* Premium wordmark */}
+            <div className="mb-5">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="relative w-10 h-10 rounded-lg bg-gradient-to-br from-accent-gold/30 to-yellow-800/30 p-[1.5px]">
+                  <div className="w-full h-full rounded-[7px] bg-background-dark flex items-center justify-center">
+                    <span className="brand-gold-text font-display font-extrabold text-sm tracking-tight opacity-50">
+                      fB
+                    </span>
+                  </div>
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-display text-lg font-bold uppercase tracking-[0.06em] text-white/50 leading-none">
+                    for&ccedil;abar&ccedil;a<span className="brand-gold-text text-sm ml-0.5 font-semibold lowercase">.club</span>
+                  </span>
+                  <span className="text-[9px] uppercase tracking-[0.2em] text-accent-gold/30 font-medium mt-1">
+                    The Home of Blaugrana
+                  </span>
+                </div>
               </div>
-              <span className="font-display text-lg font-bold tracking-tight text-white/50">
-                FC Barcelona
-              </span>
+              <div className="brand-line w-16 mb-4" />
             </div>
-            <p className="text-white/30 text-sm leading-relaxed font-body mb-6">
-              Més que un club. Founded in 1899, FC Barcelona stands as a symbol
-              of Catalan identity and one of football&apos;s most decorated
-              institutions.
+
+            <p className="text-white/25 text-sm leading-relaxed font-body mb-4">
+              The beating heart of the global Cul&eacute; community. Where
+              millions unite to celebrate FC Barcelona&apos;s legacy, passion,
+              and the spirit of{" "}
+              <em className="not-italic text-white/35">
+                M&eacute;s que un club
+              </em>
+              .
             </p>
 
-            {/* Follow Us */}
-            <div className="mt-6">
+            <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.15em] text-white/20 font-semibold mb-6">
+              <span>Est. 1899</span>
+              <span className="brand-dot" />
+              <span>Global Community</span>
+            </div>
+
+            {/* Community */}
+            <div className="mt-4">
               <h4 className="text-[0.65rem] font-body font-semibold uppercase tracking-[0.15em] text-white/20 mb-3">
-                Follow Us
+                Join the Community
               </h4>
               <div className="flex gap-3">
                 {[
@@ -245,8 +267,8 @@ export default function Footer() {
         <div className="border-t border-white/5 pt-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <p className="text-[10px] uppercase tracking-widest text-slate-600">
-              &copy; {new Date().getFullYear()} FC Barcelona Fan Website. All
-              rights reserved.
+              &copy; {new Date().getFullYear()} for&ccedil;abar&ccedil;a.club
+              &mdash; All rights reserved.
             </p>
             <p className="flex items-center gap-1.5 text-[10px] uppercase tracking-widest text-slate-600">
               Built with

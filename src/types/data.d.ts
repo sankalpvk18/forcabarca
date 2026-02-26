@@ -40,6 +40,7 @@ declare module "@/data/history.json" {
     title: string;
     description: string;
     category: string;
+    image: string;
   }
 
   const history: HistoryItem[];

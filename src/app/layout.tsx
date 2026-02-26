@@ -12,24 +12,28 @@ const lexend = Lexend({
 });
 
 export const metadata: Metadata = {
-  title: "FC Barcelona - Official Fan Website",
+  title: "forçabarça.club — The Home of Blaugrana",
   description:
-    "The ultimate FC Barcelona fan destination for news, fixtures, standings, squad information, and club history. Més que un club.",
+    "The ultimate FC Barcelona fan community. News, fixtures, standings, squad, and club history. Join 2M+ Culés worldwide. Més que un club.",
   keywords: [
     "Barcelona",
     "FC Barcelona",
     "Barça",
+    "Força Barça",
+    "forcabarca",
     "La Liga",
     "Champions League",
     "Camp Nou",
     "Football",
+    "Culés",
   ],
   openGraph: {
-    title: "FC Barcelona - Official Fan Website",
+    title: "forçabarça.club — The Home of Blaugrana",
     description:
-      "The ultimate FC Barcelona fan destination. Més que un club.",
+      "The ultimate FC Barcelona fan community. Join 2M+ Culés worldwide. Més que un club.",
     type: "website",
     locale: "en_US",
+    siteName: "forçabarça.club",
   },
 };
 

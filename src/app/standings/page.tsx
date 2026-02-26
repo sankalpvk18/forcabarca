@@ -76,7 +76,7 @@ export default function StandingsPage() {
   }
 
   const barcaTeam = standings.find(
-    (t) => t.team.id === 81 || t.team.name.includes("Barcelona")
+    (t) => t.team.id === 529 || t.team.name.includes("Barcelona")
   );
 
   const recentForm = ["W", "W", "D", "W", "L"];
@@ -322,7 +322,7 @@ export default function StandingsPage() {
               <tbody>
                 {standings.map((team, index) => {
                   const isBarcelona =
-                    team.team.id === 81 || team.team.name.includes("Barcelona");
+                    team.team.id === 529 || team.team.name.includes("Barcelona");
                   const isChampions = team.position <= 4;
                   const isRelegation = team.position >= 18;
 

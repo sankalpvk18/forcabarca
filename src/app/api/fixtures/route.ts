@@ -1,5 +1,24 @@
 import { NextResponse } from "next/server";
 
+const STATUS_MAP: Record<string, string> = {
+  TBD: "SCHEDULED",
+  NS: "TIMED",
+  "1H": "IN_PLAY",
+  HT: "IN_PLAY",
+  "2H": "IN_PLAY",
+  ET: "IN_PLAY",
+  BT: "IN_PLAY",
+  P: "IN_PLAY",
+  FT: "FINISHED",
+  AET: "FINISHED",
+  PEN: "FINISHED",
+  PST: "POSTPONED",
+  CANC: "CANCELLED",
+  ABD: "CANCELLED",
+  SUSP: "SUSPENDED",
+  INT: "SUSPENDED",
+};
+
 export async function GET() {
   try {
     const apiKey = process.env.FOOTBALL_DATA_API_KEY;
@@ -11,13 +30,17 @@ export async function GET() {
       );
     }
 
+    // Free api-football plan caps at 2024
+    const now = new Date();
+    const season = Math.min(now.getMonth() >= 7 ? now.getFullYear() : now.getFullYear() - 1, 2024);
+
     const response = await fetch(
-      "https://api.football-data.org/v4/teams/81/matches",
+      `https://v3.football.api-sports.io/fixtures?team=529&season=${season}`,
       {
         headers: {
-          "X-Auth-Token": apiKey,
+          "x-apisports-key": apiKey,
         },
-        next: { revalidate: 1800 }, // Cache for 30 minutes
+        next: { revalidate: 1800 },
       }
     );
 
@@ -26,7 +49,43 @@ export async function GET() {
     }
 
     const data = await response.json();
-    return NextResponse.json(data);
+
+    // Transform api-football format to match frontend expectations
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const matches = (data.response || []).map((entry: any) => {
+      const roundStr = entry.league.round || "";
+      const matchdayMatch = roundStr.match(/(\d+)/);
+      const matchday = matchdayMatch ? parseInt(matchdayMatch[1], 10) : null;
+
+      return {
+        id: entry.fixture.id,
+        utcDate: entry.fixture.date,
+        status: STATUS_MAP[entry.fixture.status.short] || "SCHEDULED",
+        matchday,
+        stage: roundStr,
+        homeTeam: {
+          id: entry.teams.home.id,
+          name: entry.teams.home.name,
+          crest: entry.teams.home.logo,
+        },
+        awayTeam: {
+          id: entry.teams.away.id,
+          name: entry.teams.away.name,
+          crest: entry.teams.away.logo,
+        },
+        score: {
+          fullTime: {
+            home: entry.goals.home,
+            away: entry.goals.away,
+          },
+        },
+        competition: {
+          name: entry.league.name,
+        },
+      };
+    });
+
+    return NextResponse.json({ matches });
   } catch (error) {
     console.error("Error fetching fixtures:", error);
     return NextResponse.json(
